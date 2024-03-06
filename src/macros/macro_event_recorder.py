@@ -78,7 +78,7 @@ class MacroEventRecorder:
 
         self.pressed_keys.add(key_char)
         self.macro_events.append(MacroEvent(EventType.KEY_DOWN, key_char))
-        #print(f"Key pressed: {key_char}")
+        print(f"Key pressed: {key_char}")
         return True
 
     def on_key_release(self, key):

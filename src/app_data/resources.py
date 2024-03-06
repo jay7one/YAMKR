@@ -17,4 +17,4 @@ class Resources:
         return cls.resource_path(path.join("assets", asset_name))
 
 if __name__ == "__main__":
-    print( f"{Resources.resource_path('test1')}")
+    print(f"{Resources.resource_path('test1')}")

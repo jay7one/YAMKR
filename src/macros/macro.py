@@ -1,29 +1,20 @@
 import os
-from dataclasses import dataclass
 import json
 import unittest
+import time
 from macros.macro_event import MacroEvent, EventType
+from macros.macro_event_manager import MacroEventManager
+from macros.macro_data import MacroData
+MACRO_EXT = '.mac'
 
-@dataclass
-class MacroData:
-    name: str
-    hotkey : str = ""
-
-    global_keypress_interval : int = 20
-    global_mousepress_interval : int = 20
-    global_keypress_interval_on : bool = False
-    global_mousepress_interval_on : bool = False
-    global_mouse_offset_x : int = 0
-    global_mouse_offset_y : int = 0
-    global_mouse_movement : bool = False
-    global_repeat = 1
-
-class Macro(MacroData):
-    EXTENTION = '.mac'
+class Macro(MacroData, MacroEventManager):
 
     def __init__(self, name, events, **kwargs):
-        super().__init__(name=name)
+        MacroData.__init__(self,name=name)
+        MacroEventManager.__init__(self)
+
         self.events:list[MacroEvent] = events
+        #print(f"Macro events loaded:{len(self.events)}")
         for key, value in kwargs.items():
             setattr(self, key, value)
 
@@ -32,6 +23,16 @@ class Macro(MacroData):
         with open(file_path, "r", encoding='utf-8') as macro_file:
             json_data = json.loads(macro_file.read())
         return cls.build_from_json(json_data)
+
+    @classmethod
+    def get_hotkey(cls,name,filepath):
+        file_path=os.path.join(filepath, name + MACRO_EXT)
+        macro = cls.from_file(file_path)
+        return macro.hotkey
+
+    @classmethod
+    def from_name(cls,name, save_path):
+        return cls.from_file(os.path.join(save_path, name + MACRO_EXT))
 
     @classmethod
     def from_json(cls, json_str):
@@ -83,6 +84,12 @@ class Macro(MacroData):
     def clear(self):
         self.events = []
 
+    def play(self):
+        self.play_macro(self.events,self)
+
+    def record(self):
+        self.events = self.record_macro()
+
 class TestMacroConversion(unittest.TestCase):
     def setUp(self):
         self.json_data = '''
@@ -93,9 +100,9 @@ class TestMacroConversion(unittest.TestCase):
                 {"event_type": "delay", "event_value": "200"},
                 {"event_type": "key_up", "event_value": "A"},
                 {"event_type": "delay", "event_value": "200"},
-                {"event_type": "click_down", "event_value": "left"},
+                {"event_type": "click_down", "event_value": ["left", 10,10] },
                 {"event_type": "delay", "event_value": "200"},
-                {"event_type": "click_up", "event_value": "left"}
+                {"event_type": "click_up", "event_value": ["left", 10,10] }
             ],
             "global_keypress_interval": 50,
             "global_mousepress_interval": 20,
@@ -104,11 +111,26 @@ class TestMacroConversion(unittest.TestCase):
             "hotkey": "Ctrl+Alt+M",
             "global_mouse_offset_x": 0,
             "global_mouse_offset_y": 0,
+            "global_release_interval" : 500,
+            "global_release_interval_on" : false,
             "global_repeat": 1
         }
         '''
 
-    def test_conversion(self):
+    def test01_record(self):
+        print("Start recording events")
+        macro_name = "MacroTest01"
+        macro_instance = Macro(macro_name,[])
+        macro_instance.record()
+        macro_instance.save(".")
+        new_macro = Macro.from_file(f"{macro_name}.mac")
+
+        converted_json_data1 = macro_instance.to_json()
+        converted_json_data2 = new_macro.to_json()
+
+        self.assertEqual(json.loads(converted_json_data1), json.loads(converted_json_data2))
+
+    def test02_conversion(self):
         # Convert JSON data to Macro
         macro_instance = Macro.from_json(self.json_data)
         # Convert Macro back to JSON string
@@ -118,7 +140,7 @@ class TestMacroConversion(unittest.TestCase):
         # Compare original JSON string with converted JSON string
         self.assertEqual(json.loads(converted_json_data1), json.loads(converted_json_data2))
 
-    def test_io(self):
+    def test03_io(self):
         macro_instance = Macro.from_json(self.json_data)
         converted_json_data1 = macro_instance.to_json()
         macro_instance.save("")
@@ -126,5 +148,19 @@ class TestMacroConversion(unittest.TestCase):
         converted_json_data2 = new_macro.to_json()
         self.assertEqual(json.loads(converted_json_data1), json.loads(converted_json_data2))
 
+    def test04_play(self):
+        print("Start playback in 2 seconds")
+        time.sleep(2)
+        macro_name = "MacroTest01"
+        macro_instance = Macro.from_name(macro_name,"")
+        macro_instance.global_mouse_movement=True
+        macro_instance.print_events(macro_instance.events)
+        macro_instance.play()
+
+        print(f"Macro:{macro_instance}")
+        self.assertTrue(macro_instance.events)
+
+
 if __name__ == "__main__":
+    import helpers.screen_setup # pylint: disable=unused-import
     unittest.main()

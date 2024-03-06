@@ -4,10 +4,11 @@ import glob
 import json
 import unittest
 from app_data.settings import Settings
-from macros.macro import Macro
+from macros.macro import Macro, MACRO_EXT
 
 class MacroManager(Settings):
     CONTENT="macros"
+
     def __init__(self, initial_values=None):
         super().__init__("Macros", False, initial_values)
         self.macros_path = os.path.join(self.dir_path, MacroManager.CONTENT )
@@ -23,17 +24,20 @@ class MacroManager(Settings):
     def get_macro_list(self):
         mac_files = dict()
         for root, _, _ in os.walk(self.macros_path):
-            for file in glob.glob(os.path.join(root, '*' + Macro.EXTENTION)):
+            for file in glob.glob(os.path.join(root, '*' + MACRO_EXT)):
                 filename = os.path.splitext(os.path.basename(file))[0]
-                mac_files[filename] = file
+                mac_files[filename] = Macro.get_hotkey(filename,self.macros_path)
         return mac_files
+
+    def get_macro_fullpath(self, name):
+        return os.path.join(self.dir_path, self.CONTENT, name + MACRO_EXT  )
 
     def initial_settings(self):
         return {MacroManager.CONTENT: {} }
 
     def remove_macro(self, macro_name):
         settings = self.get_config()
-        macro_path = settings[MacroManager.CONTENT][macro_name]
+        macro_path = self.get_macro_fullpath(macro_name)
         del settings[MacroManager.CONTENT][macro_name]
         os.remove(macro_path)
         self.save_settings(json.dumps(settings, indent=4))
@@ -41,20 +45,20 @@ class MacroManager(Settings):
     def rename_macro(self, macro:Macro , new_name):
         settings = self.get_config()
 
-        macro_path = settings[MacroManager.CONTENT][macro.name]
+        macro_path = self.get_macro_fullpath(Macro.name)
         del settings[MacroManager.CONTENT][macro.name]
         macro.name = new_name
-        new_path = os.path.join(self.macros_path, new_name + Macro.EXTENTION)
+        new_path = self.get_macro_fullpath(new_name)
         os.rename(macro_path, new_path)
-        settings[MacroManager.CONTENT][new_name] = new_path
+        settings[MacroManager.CONTENT][new_name] = macro.hotkey
         self.save_settings(json.dumps(settings, indent=4))
 
     def save_macro(self, macro:Macro):
         settings = self.get_config()
-        print(f"Saveing actual macro :{self.macros_path}|{macro}")
-        file_path = macro.save(self.macros_path)
-        settings[MacroManager.CONTENT][macro.name] = file_path
-        self.change_settings(MacroManager.CONTENT, option=macro.name, new_value = file_path)
+        #print(f"Saving actual macro :{self.macros_path}|{macro}")
+        macro.save(self.macros_path)
+        settings[MacroManager.CONTENT][macro.name] = macro.hotkey
+        self.change_settings(MacroManager.CONTENT, option=macro.name, new_value = macro.hotkey)
 
     def clear_macro(self,macro:Macro ):
         macro.clear()
@@ -66,9 +70,11 @@ class MacroManager(Settings):
         return sorted(self.get_setting(MacroManager.CONTENT).keys())
 
     def load_macro(self, name):
-        return Macro.from_file(self.get_setting(MacroManager.CONTENT,[name]))
+        macro = Macro.from_file(self.get_macro_fullpath(name))
+        #print(f"Loaded Macro {name} events:{len(macro.events)}")
+        return macro
 
-    def clear_macros(self):
+    def clear_macros(self):         # used for testing
         self.reset_settings()
         if os.path.exists(self.macros_path):
             shutil.rmtree(self.macros_path)
@@ -86,17 +92,18 @@ class TestMacroSave(unittest.TestCase):
                 {"event_type": "delay", "event_value": "200"},
                 {"event_type": "key_up", "event_value": "A"},
                 {"event_type": "delay", "event_value": "200"},
-                {"event_type": "click_down", "event_value": "left"},
+                {"event_type": "click_down", "event_value": "left, 20,20"},
                 {"event_type": "delay", "event_value": "200"},
-                {"event_type": "click_up", "event_value": "left"}
+                {"event_type": "click_up", "event_value": "left, 20,20"}
             ],
             "global_keypress_interval": 50,
             "global_mousepress_interval": 20,
             "global_keypress_interval_on": true,
             "global_mousepress_interval_on": false,
-            "hotkey": "Ctrl+Alt+M",
+            "hotkey": "F3",
             "global_mouse_offset_x": 0,
-            "global_mouse_offset_y": 0
+            "global_mouse_offset_y": 0,
+            "global_repeat" : 1
         }
         '''
 
@@ -110,8 +117,6 @@ class TestMacroSave(unittest.TestCase):
         macro_manger.remove_macro("MyMac2")
 
         content = macro_manger.get_config()[MacroManager.CONTENT]
-
-        print()
         self.assertEqual(content,{})
 
 
