@@ -7,19 +7,29 @@ from pynput.keyboard import Listener as KeyboardListener, Key
 from pynput.mouse import Button
 from macros.macro_event import MacroEvent, EventType
 
+# pylint: disable=attribute-defined-outside-init
+
 class MacroEventRecorder:
     def __init__(self):
         self.macro_events = []
+        self.prep_macro()
+
+    def prep_macro(self):
         self.pressed_keys = set()
+        self.offsets = 0,0
+        self.last_event_time = None
         self.ctrl_pressed = False
         self.end_pressed = False
-        self.last_event_time = None
         self.stop_event = threading.Event()
+        self.last_event_time = None
         self.keyboard_listener = None
         self.mouse_listener = None
 
-    def record_macro(self):
-        self.last_event_time = None
+    def record_macro(self, offsets):
+
+        self.prep_macro()
+        self.offsets = offsets
+
         self.keyboard_listener = KeyboardListener(on_press=self.on_key_press, on_release=self.on_key_release)
         self.mouse_listener = MouseListener(on_click=self.on_mouse_click)
         self.keyboard_listener.start()
@@ -55,12 +65,18 @@ class MacroEventRecorder:
         elif button == Button.middle:       event_value = "middle"
         else: return
 
+        ox,oy = self.offsets
+        x -= ox
+        y -= oy
+
         event_type = EventType.CLICK_DOWN if pressed else EventType.CLICK_UP
         self.macro_events.append(MacroEvent(event_type, (event_value, x, y)))
 
     def on_key_press(self, key):
-        if key == Key.ctrl_l:       self.ctrl_pressed = True
-        elif key == Key.end:        self.end_pressed = True
+        if key == Key.ctrl_l:
+            self.ctrl_pressed = True
+        elif key == Key.end:
+            self.end_pressed = True
 
         if self.ctrl_pressed and self.end_pressed:
             self.stop_event.set()
@@ -78,7 +94,7 @@ class MacroEventRecorder:
 
         self.pressed_keys.add(key_char)
         self.macro_events.append(MacroEvent(EventType.KEY_DOWN, key_char))
-        print(f"Key pressed: {key_char}")
+        #print(f"Key pressed: {key_char}")
         return True
 
     def on_key_release(self, key):
@@ -129,4 +145,4 @@ class MacroEventRecorder:
 if __name__ == "__main__":
     recorder = MacroEventRecorder()
     print("Recording macro. Press 'Ctrl + End' to stop.")
-    MacroEventRecorder.print_events(recorder.record_macro())
+    MacroEventRecorder.print_events(recorder.record_macro((0,0)))

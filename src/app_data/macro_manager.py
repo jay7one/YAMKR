@@ -12,21 +12,48 @@ class MacroManager(Settings):
     def __init__(self, initial_values=None):
         super().__init__("Macros", False, initial_values)
         self.macros_path = os.path.join(self.dir_path, MacroManager.CONTENT )
+        self.hotkey_list = {}
         if not os.path.isdir(self.macros_path):
             os.mkdir(self.macros_path)
         self.update_macro_list()
 
+
     def update_macro_list(self):
         macro_list = self.get_macro_list()
+        self.reset_settings()
         for k,v in macro_list.items():
             self.change_settings(MacroManager.CONTENT, option=k, new_value=v)
+
+    def find_hotkey_macro(self,hotkey):
+        for key, value in self.hotkey_list.items():
+            if key == hotkey: return value
+        return None
+
+    def update_hotkey_list(self, name, hotkey):
+        if hotkey == "":    self.remove_hotkey(name)
+        else:               self.hotkey_list[hotkey] = name
+
+    def remove_hotkey(self,name):
+        for key, value in self.hotkey_list.items():
+            if value == name:
+                del self.hotkey_list[key]
+                return
+
+    def macro_exists(self, macro_name):
+        return macro_name in self.get_setting(MacroManager.CONTENT).keys()
+
+    def refresh_hotkey(self, macro_name):
+        hotkey = Macro.get_hotkey(macro_name, self.macros_path)
+        self.update_hotkey_list(macro_name, hotkey)
+        return hotkey
 
     def get_macro_list(self):
         mac_files = dict()
         for root, _, _ in os.walk(self.macros_path):
             for file in glob.glob(os.path.join(root, '*' + MACRO_EXT)):
                 filename = os.path.splitext(os.path.basename(file))[0]
-                mac_files[filename] = Macro.get_hotkey(filename,self.macros_path)
+                mac_files[filename] = self.refresh_hotkey(filename)
+                #print(f"Found {file=}")
         return mac_files
 
     def get_macro_fullpath(self, name):
@@ -38,23 +65,33 @@ class MacroManager(Settings):
     def remove_macro(self, macro_name):
         settings = self.get_config()
         macro_path = self.get_macro_fullpath(macro_name)
+        self.remove_hotkey(macro_name)
         del settings[MacroManager.CONTENT][macro_name]
         os.remove(macro_path)
         self.save_settings(json.dumps(settings, indent=4))
 
     def rename_macro(self, macro:Macro , new_name):
         settings = self.get_config()
-
-        macro_path = self.get_macro_fullpath(Macro.name)
+        macro_path = self.get_macro_fullpath(macro.name)
+        self.remove_hotkey(macro.name)
         del settings[MacroManager.CONTENT][macro.name]
+
         macro.name = new_name
+        self.update_hotkey_list(macro.name,macro.hotkey)
         new_path = self.get_macro_fullpath(new_name)
         os.rename(macro_path, new_path)
         settings[MacroManager.CONTENT][new_name] = macro.hotkey
         self.save_settings(json.dumps(settings, indent=4))
 
+    def new_macro(self,name,hotkey):
+        new_mac = Macro(name,[])
+        new_mac.hotkey = hotkey
+        self.save_macro(new_mac)
+        return new_mac
+
     def save_macro(self, macro:Macro):
         settings = self.get_config()
+        self.update_hotkey_list(macro.name,macro.hotkey)
         #print(f"Saving actual macro :{self.macros_path}|{macro}")
         macro.save(self.macros_path)
         settings[MacroManager.CONTENT][macro.name] = macro.hotkey
@@ -66,8 +103,10 @@ class MacroManager(Settings):
     def get_macros(self):
         return self.get_setting(MacroManager.CONTENT)
 
-    def get_macro_names(self):
-        return sorted(self.get_setting(MacroManager.CONTENT).keys())
+    def get_macro_names(self, refresh=False):
+        if refresh:
+            self.update_macro_list()
+        return sorted(self.get_setting(MacroManager.CONTENT).keys(), key=str.casefold)
 
     def load_macro(self, name):
         macro = Macro.from_file(self.get_macro_fullpath(name))
@@ -79,11 +118,12 @@ class MacroManager(Settings):
         if os.path.exists(self.macros_path):
             shutil.rmtree(self.macros_path)
         os.mkdir(self.macros_path)
+        self.hotkey_list = {}
         self.update_macro_list()
 
 class TestMacroSave(unittest.TestCase):
     def setUp(self):
-
+        self.mac_name = "MyMacro"
         self.json_data = '''
         {
             "name": "MyMacro",
@@ -107,30 +147,45 @@ class TestMacroSave(unittest.TestCase):
         }
         '''
 
+        self.macro_instance = Macro.from_json(self.json_data)
+        self.macro_manger = MacroManager()
+        self.macro_manger.clear_macros()
+        self.macro_manger.save_macro(self.macro_instance)
+
     def test01_save(self):
-        macro_instance = Macro.from_json(self.json_data)
-        macro_manger = MacroManager()
-        macro_manger.clear_macros()
-
-        macro_manger.save_macro(macro_instance)
-        macro_manger.rename_macro(macro_instance, "MyMac2")
-        macro_manger.remove_macro("MyMac2")
-
-        content = macro_manger.get_config()[MacroManager.CONTENT]
+        self.macro_manger.rename_macro(self.macro_instance, "MyMac2")
+        self.macro_manger.remove_macro("MyMac2")
+        content = self.macro_manger.get_config()[MacroManager.CONTENT]
         self.assertEqual(content,{})
 
-
     def test02_load(self):
-        macro_instance = Macro.from_json(self.json_data)
-        macro_manger = MacroManager()
-        macro_manger.clear_macros()
+        loaded_macro = self.macro_manger.load_macro(self.mac_name)
+        #print(f"Macro list: {self.macro_manger.get_macro_list()}")
+        self.assertEqual(loaded_macro.name, self.mac_name)
 
-        macro_manger.save_macro(macro_instance)
-        print(f"Macro saved: {macro_instance}")
-        macro_name = 'MyMacro'
-        loaded_macro = macro_manger.load_macro(macro_name)
-        print(f"Macro list: {macro_manger.get_macro_list()}")
-        self.assertEqual(loaded_macro.name, macro_name)
+    def test03_hotkey(self):
+        #print(f"HKList:{self.macro_manger.hotkey_list=}")
+        self.assertEqual(self.macro_manger.find_hotkey_macro("F3"), self.mac_name)
+
+    def test04_hotkey(self):
+        self.assertEqual(self.macro_manger.find_hotkey_macro("NoMacro"), None)
+
+    def test05_hotkey(self):
+        self.macro_manger.update_hotkey_list(self.mac_name, "F4")
+        self.assertEqual(self.macro_manger.find_hotkey_macro("F4"), self.mac_name)
+
+    def test06_hotkey(self):
+        mac_name1 = self.macro_manger.find_hotkey_macro("F3")
+        self.macro_manger.remove_hotkey(self.mac_name)
+        mac_name2 = self.macro_manger.find_hotkey_macro("F3")
+        check = mac_name1 == self.mac_name and mac_name2 is None
+        self.assertEqual(check,True)
+
+    def test06_exists(self):
+        self.assertEqual(self.macro_manger.macro_exists(self.mac_name), True)
+
+    def test07_exists(self):
+        self.assertEqual(self.macro_manger.macro_exists("MacroNone"), False)
 
 if __name__ == "__main__":
     unittest.main()

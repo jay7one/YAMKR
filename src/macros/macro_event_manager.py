@@ -2,7 +2,7 @@ import time
 import threading
 
 from pynput.keyboard import Controller as KeyboardController, Listener as KeyboardListener, Key
-from pynput.mouse import Controller as MouseController, Button
+from pynput.mouse import Controller as MouseController
 from macros.macro_event import MacroEvent, EventType
 from macros.macro_event_recorder import MacroEventRecorder
 from macros.macro_data import MacroData
@@ -142,7 +142,7 @@ if __name__ == "__main__":
 
     print("Start recording")
     # Stop recording when Ctrl + End is pressed
-    evts=manager.record_macro()
+    evts=manager.record_macro((0,0))
     print("Stopped recording, sleep 2 secs then playback")
 
     time.sleep(2)

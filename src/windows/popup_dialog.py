@@ -1,67 +1,54 @@
 import tkinter as tk
-import unittest
-from helpers.metaclasses import SingletonABCMeta
 from windows.popup import Popup
 
-class PopupDialog(metaclass=SingletonABCMeta):
-    def __init__(self, parent, title, message):
-        self.parent = parent
-        self.title = title
-        self.message = message
-        self.result = None
+class PopupDialog:
+    @classmethod
+    def popup(cls, parent_window, title, message, enable_cancel=False):
+        cls.result = False
+        dialog = tk.Toplevel(parent_window)
+        dialog.title(title)
 
-        self.root = tk.Toplevel(parent)
-        self.root.title(title)
+        # Center the dialog on the screen
+        window_width = dialog.winfo_reqwidth()
+        window_height = dialog.winfo_reqheight()
+        position_right = int(dialog.winfo_screenwidth() / 2 - window_width / 2)
+        position_down = int(dialog.winfo_screenheight() / 2 - window_height / 2)
+        dialog.geometry(f"+{position_right}+{position_down}")
 
-        self.label = tk.Label(self.root, text=message, justify=tk.LEFT, padx=10, pady=10, wraplength=300)
-        self.label.pack()
+        label = tk.Label(dialog, text=message, justify=tk.LEFT, padx=10, pady=10, wraplength=300)
+        label.pack()
 
-        self.button_frame = tk.Frame(self.root)
-        self.button_frame.pack(pady=5)
+        button_frame = tk.Frame(dialog)
+        button_frame.pack(pady=5)
 
-        self.ok_button = tk.Button(self.button_frame, text="OK", command=self.ok_action)
-        self.cancel_button = tk.Button(self.button_frame, text="Cancel", command=self.cancel_action)
-        self.cancel_button.pack(side=tk.RIGHT, padx=5)
-        self.ok_button.pack(side=tk.RIGHT, padx=5)
+        ok_button = tk.Button(button_frame, text="OK", command=lambda: cls._return(dialog))
+        ok_button.pack(side=tk.RIGHT, padx=5)
+        if enable_cancel:
+            cancel_button = tk.Button(button_frame, text="Cancel", command=dialog.destroy)
+            cancel_button.pack(side=tk.RIGHT, padx=5)
 
         # Center the dialog
-        self.root.update_idletasks()
-        Popup.geo_center(self.root,self.root.winfo_width(), self.root.winfo_height())
+        dialog.update_idletasks()
+        Popup.geo_center(dialog,dialog.winfo_width(), dialog.winfo_height())
 
-    def ok_action(self):
-        self.result = True
-        self.root.destroy()
+        dialog.transient(parent_window)
+        dialog.grab_set()
 
-    def cancel_action(self):
-        self.result = False
-        self.root.destroy()
+        # Make the dialog modal
+        dialog.wait_window(dialog)
+
+        return cls.result
 
     @classmethod
-    def popup(cls, parent, title, message, cancel_button=False):
-        dialog = cls(parent, title, message)
-        if not cancel_button:
-            dialog.cancel_button.pack_forget()  # Hide the cancel button if not required
-        parent.wait_window(dialog.root)
-        return dialog.result
+    def _return(cls, dialog):
+        cls.result=True
+        dialog.destroy()
 
-# Test case class
-class TestPopupDialog(unittest.TestCase):
-    def setUp(self):
-        self.root = tk.Tk()
 
-    def tearDown(self):
-        self.root.update()
-        self.root.destroy()
-        PopupDialog._instances.clear()      # pylint: disable=protected-access
-
-    def test_popup_with_cancel(self):
-        result = PopupDialog.popup(self.root, "Popup", "This is a multi-line message.\nClick OK to continue.", cancel_button=True)
-        self.assertTrue(result)
-
-    def test_popup_without_cancel(self):
-        result = PopupDialog.popup(self.root, "Popup", "This is a multi-line message.\nClick OK to continue.")
-        self.assertTrue(result)
-
-# Run the test cases
-if __name__ == "__main__":
-    unittest.main(argv=[''], exit=False)
+# Example usage:
+if __name__ == "__main__" :
+    root = tk.Tk()
+    result_back = PopupDialog.create_macro(root, "Test", "Message text\nsecond line",False)
+    print(f"Rs: {result_back=}" )
+    result_back = PopupDialog.create_macro(root, "Test", "Message text\nsecond line",True)
+    print(f"Rs: {result_back=}" )

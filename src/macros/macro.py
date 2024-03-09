@@ -76,7 +76,7 @@ class Macro(MacroData, MacroEventManager):
         return json.dumps(self.to_dict(), sort_keys=False, indent=2)
 
     def save(self, save_path):
-        file_path=os.path.join(save_path, self.name + Macro.EXTENTION)
+        file_path=os.path.join(save_path, self.name + MACRO_EXT)
         with open(file_path, "w", encoding='utf-8') as macro_file:
             macro_file.write(self.to_json())
         return file_path
@@ -88,7 +88,8 @@ class Macro(MacroData, MacroEventManager):
         self.play_macro(self.events,self)
 
     def record(self):
-        self.events = self.record_macro()
+        offsets = (self.global_mouse_offset_x, self.global_mouse_offset_y, )
+        self.events.extend(self.record_macro(offsets))
 
 class TestMacroConversion(unittest.TestCase):
     def setUp(self):

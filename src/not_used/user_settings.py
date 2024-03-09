@@ -7,30 +7,6 @@ class UserSettings(Settings):
 
     def initial_settings(self):
         return  {
-            "Playback": {
-                "Speed": 1,
-                "Repeat": {
-                    "Times": 1,
-                    "For": 0,
-                    "Interval": 0,
-                    "Delay": 0
-                }
-            },
-
-            "Recordings": {
-                "Mouse_Move": True,
-                "Mouse_Click": True,
-                "Keyboard": True,
-            },
-
-            "Hotkeys": {
-                "Record_Start": [],
-                "Record_Stop": [],
-                "Playback_Start": [],
-                "Playback_Stop": [
-                    "Key.f3"
-                ],
-            },
 
             "Minimization": {
                 "When_Playing": False,

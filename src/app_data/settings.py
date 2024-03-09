@@ -54,6 +54,9 @@ class Settings(ABC, metaclass=SingletonABCMeta):
             setting_file_json = load(setting_file)
         return setting_file_json
 
+    def save_dict(self, updated_dict):
+        self.save_settings(dumps(updated_dict, indent=4))
+
     def save_settings(self, updated_values):
         with open(self.file_path, "w", encoding='utf-8') as setting_file:
             setting_file.write(updated_values)

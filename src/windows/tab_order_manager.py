@@ -32,17 +32,5 @@ class TabOrderManager(tk.Frame):
         widgets.sort(key=lambda w: (w.abs_y, w.abs_x))
 
         for widget_info in widgets:
-            if widget_info.widget.winfo_x() < 0: continue
-
-            widget_info.widget.lift()
-            '''
-                w = widgets[i].widget
-
-                if isinstance(w,tk.Button):
-                    btn:tk.Button = w
-                    print(f"Btn: {btn['text']}, {(w.winfo_x(), w.winfo_y())=}")
-                else:
-                    ent:tk.Entry = w
-                    print(f"{ent=}, {(ent.winfo_x(), ent.winfo_y())=}")
-            '''
-
+            if widget_info.widget.winfo_x() >= 0:
+                widget_info.widget.lift()

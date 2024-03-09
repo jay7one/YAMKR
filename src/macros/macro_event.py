@@ -35,14 +35,19 @@ class MacroEvent:
             return str(self.event_type), *self.event_value
 
     def mouse_event_data(self):
+        #print(f"Debug: evt {(self.event_type,self.event_value)=}")
+
         if str(self.event_type)[0].upper() != "C":
             raise ValueError("Event Type is not a click up or down")
 
-        parts = self.event_value
-        btn = parts[0].strip()  # Extracting direction part
-        x = int(parts[1])  # Converting x-coordinate to integer
-        y = int(parts[2])  # Converting y-coordinate to integer
-        return btn,x,y
+        if isinstance(self.event_value,str):
+            parts = self.event_value.strip('()').split(",")
+            btn = parts[0].strip()  # Extracting direction part
+            x = int(parts[1])  # Converting x-coordinate to integer
+            y = int(parts[2])  # Converting y-coordinate to integer
+            return btn,x,y
+
+        return self.event_value
 
     def abv(self):
         # print(f"abv :{(self.event_type,self.event_value)=}")
