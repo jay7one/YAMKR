@@ -7,7 +7,7 @@ from helpers.metaclasses import SingletonABCMeta
 
 class Settings(ABC, metaclass=SingletonABCMeta):
     """Class to interact with user_settings.json"""
-    def __init__(self, setting_type, check_new=False, initial_values=None, app_name = 'PyMouseMacros'):
+    def __init__(self, setting_type, check_new=False, initial_values=None, app_name = 'PyMouseMacro'):
 
         self.setting_type = setting_type
         self.check_new = check_new

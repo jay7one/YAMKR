@@ -20,4 +20,4 @@ class FileExplorer:
 
 # Example usage:
 if __name__ == "__main__":
-    FileExplorer.open("C:/Users/sauja/AppData/Local/PyMouseMacros/macros")
+    FileExplorer.open("C:/Users/sauja/AppData/Local/PyMouseMacro/macros")

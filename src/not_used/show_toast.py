@@ -9,8 +9,8 @@ def show_notification_minim():
         toast = ToastNotifier()
         try:
             toast.show_toast(
-                title="PyMouseMacros minimized",
-                msg="PyMouseMacros has been minimized",
+                title="PyMouseMacro minimized",
+                msg="PyMouseMacro has been minimized",
                 duration=3,
                 icon_path=Resources.get_asset("logo.ico")
             )
@@ -18,6 +18,6 @@ def show_notification_minim():
             pass
 
     elif "linux" in platform.lower():
-        subprocess.call("""notify-send -u normal "PyMouseMacros" "PyMouseMacros has been minimized" """, shell=False)
+        subprocess.call("""notify-send -u normal "PyMouseMacro" "PyMouseMacro has been minimized" """, shell=False)
     elif "darwin" in platform.lower():
-        subprocess.call("""display notification "PyMouseMacros has been minimized" with title "PyMouseMacros""", shell=False)
+        subprocess.call("""display notification "PyMouseMacro has been minimized" with title "PyMouseMacro""", shell=False)

@@ -210,6 +210,7 @@ class AppBridge(TkinterHelper):
 
     def get_entry_int(self, entry:tk.Entry):
         text = entry.get()
+        print(f"Entry {text=}")
         if text == "" : return 0
         return int(text)
 

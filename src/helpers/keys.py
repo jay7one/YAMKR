@@ -17,7 +17,7 @@ class Keys:
     @classmethod
     def get_key_pressed(cls,keyboard_listener, key):
         """
-        Return right key. canonical() prevents from weird characters to show up with ctrl active. Like ctrl + d,
+        Return right key. canonical() prevents from weird characters to show up with ctrl active, like ctrl + d,
         pynput will not print Key.ctrl and d, it will print Key.ctrl and a weird character
         """
 

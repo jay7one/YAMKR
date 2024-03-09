@@ -21,7 +21,7 @@ set vTcl(actual_gui_font_tooltip_desc)  TkDefaultFont
 set vTcl(actual_gui_font_tooltip_name)  TkDefaultFont
 set vTcl(actual_gui_font_treeview_desc)  TkDefaultFont
 set vTcl(actual_gui_font_treeview_name)  TkDefaultFont
-########################################### 
+###########################################
 set vTcl(actual_gui_bg) #d9d9d9
 set vTcl(actual_gui_fg) #000000
 set vTcl(actual_gui_analog) #ececec
@@ -35,7 +35,7 @@ set vTcl(tabfg1) black
 set vTcl(tabfg2) white
 set vTcl(actual_gui_menu_active_bg)  #ececec
 set vTcl(actual_gui_menu_active_fg)  #000000
-########################################### 
+###########################################
 set vTcl(pr,autoalias) 1
 set vTcl(pr,relative_placement) 1
 set vTcl(mode) Absolute
@@ -57,7 +57,7 @@ proc vTclWindow.top1 {base} {
     # CREATING WIDGETS
     ###################
     vTcl::widgets::core::toplevel::createCmd $top -class Toplevel \
-        -menu $top.m48 -background #d9d9d9 
+        -menu $top.m48 -background #d9d9d9
     wm focusmodel $top passive
     wm geometry $top 1083x711+338+168
     update
@@ -78,36 +78,36 @@ proc vTclWindow.top1 {base} {
     set vTcl(real_top) {}
     menu "$top.m48" \
         -activebackground #d9d9d9 -activeforeground black \
-        -font "-family {DejaVu Sans} -size 12" -tearoff 0 
-    
+        -font "-family {DejaVu Sans} -size 12" -tearoff 0
+
 set site_3_0 $top.m48
     $top.m48 add cascade \
         -menu "$top.m48.men47" -compound left -font "-family {DejaVu Sans} -size 12" \
-        -label "Minimize" 
+        -label "Minimize"
     menu "$site_3_0.men47" \
         -activebackground #d9d9d9 -activeforeground black \
-        -font "-family {DejaVu Sans} -size 10" -tearoff 0 
+        -font "-family {DejaVu Sans} -size 10" -tearoff 0
     $site_3_0.men47 add checkbutton \
         -variable "checks_1" -command "#menu_min_record" -compound left \
-        -font "-family {DejaVu Sans} -size 12" -label "On Record" 
+        -font "-family {DejaVu Sans} -size 12" -label "On Record"
     $site_3_0.men47 add checkbutton \
         -variable "checks_2" -command "#menu_min_play" -compound left \
-        -font "-family {DejaVu Sans} -size 12" -label "On Play" 
-    
+        -font "-family {DejaVu Sans} -size 12" -label "On Play"
+
 set site_3_0 $top.m48
     $top.m48 add cascade \
-        -menu "$top.m48.men55" -compound left -font "-family {DejaVu Sans} -size 12" -label "Help" 
+        -menu "$top.m48.men55" -compound left -font "-family {DejaVu Sans} -size 12" -label "Help"
     menu "$site_3_0.men55" \
         -activebackground #d9d9d9 -activeforeground black \
-        -font "-family {DejaVu Sans} -size 10" -tearoff 0 
+        -font "-family {DejaVu Sans} -size 10" -tearoff 0
     $site_3_0.men55 add command \
         -command "#" -compound left -font "-family {DejaVu Sans} -size 12" \
-        -label "About" 
+        -label "About"
     $site_3_0.men55 add command \
         -command "#" -compound left -font "-family {DejaVu Sans} -size 12" \
-        -label "Check for Update" 
+        -label "Check for Update"
     vTcl::widgets::ttk::scrolledlistbox::CreateCmd "$top.scr47" \
-        -background #d9d9d9 -height 75 -width 125 
+        -background #d9d9d9 -height 75 -width 125
     vTcl:DefineAlias "$top.scr47" "SLBoxMacroList" vTcl:WidgetProc "PyMouseMacros" 1
 
     $top.scr47.01 configure -activestyle none \
@@ -124,12 +124,12 @@ set site_3_0 $top.m48
         -width 10
     labelframe "$top.lab100" \
         -font "-family {DejaVu Sans} -size 10" -foreground black \
-        -text "Macro Events" -background #d9d9d9 -height 485 -width 786 
+        -text "Macro Events" -background #d9d9d9 -height 485 -width 786
     vTcl:DefineAlias "$top.lab100" "LFrameEvents" vTcl:WidgetProc "PyMouseMacros" 1
     set site_3_0 $top.lab100
     vTcl::widgets::ttk::scrolledwindow::CreateCmd "$site_3_0.scr101" \
         -borderwidth 2 -relief groove -background #d9d9d9 -height 100 \
-        -width 150 
+        -width 150
     vTcl:DefineAlias "$site_3_0.scr101" "SWinEvents" vTcl:WidgetProc "PyMouseMacros" 1
 
     $site_3_0.scr101.01 configure -background #d3d3d3 \
@@ -142,248 +142,248 @@ set site_3_0 $top.m48
     place $site_3_0.scr101 \
         -in $site_3_0 -x 0 -relx 0.013 -y 0 -rely 0.041 -width 0 \
         -relwidth 0.981 -height 0 -relheight 0.955 -anchor nw \
-        -bordermode ignore 
+        -bordermode ignore
     labelframe "$top.lab88" \
         -font "-family {DejaVu Sans} -size 10" -foreground black \
-        -text "Macro Settings" -background #d9d9d9 -height 103 -width 788 
+        -text "Macro Settings" -background #d9d9d9 -height 103 -width 788
     vTcl:DefineAlias "$top.lab88" "LFrameMacroSettings" vTcl:WidgetProc "PyMouseMacros" 1
     set site_3_0 $top.lab88
     label "$site_3_0.lab96" \
         -activebackground #d9d9d9 -activeforeground #3f3f3f -anchor w \
         -background #d9d9d9 -compound left \
         -font "-family {DejaVu Sans} -size 10" -foreground black \
-        -relief sunken 
+        -relief sunken
     vTcl:DefineAlias "$site_3_0.lab96" "LbHotKeyText" vTcl:WidgetProc "PyMouseMacros" 1
     label "$site_3_0.lab97" \
         -activebackground #d9d9d9 -activeforeground black -anchor w \
         -background #d9d9d9 -compound left \
         -font "-family {DejaVu Sans} -size 10" -foreground black \
-        -text "Hotkey:" 
+        -text "Hotkey:"
     vTcl:DefineAlias "$site_3_0.lab97" "LbHotKey" vTcl:WidgetProc "PyMouseMacros" 1
     entry "$site_3_0.ent57" \
         -background white -font "-family {DejaVu Sans Mono} -size 10" \
         -foreground #000000 -selectbackground #d9d9d9 -selectforeground black \
-        -validate key -validatecommand "validate_number" -width 10 
+        -validate key -validatecommand "validate_number" -width 10
     vTcl:DefineAlias "$site_3_0.ent57" "EntryRelDelay" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but56" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdRelDelay" -font "-family {DejaVu Sans} -size 10" \
-        -foreground #000000 -justify left -text "Release Delay:" 
-    vTcl:DefineAlias "$site_3_0.but56" "BtnPostRelIntv" vTcl:WidgetProc "PyMouseMacros" 1
+        -foreground #000000 -justify left -text "Release Delay:"
+    vTcl:DefineAlias "$site_3_0.but56" "btn_post_rel_intv" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but98" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdHotkeyAdd" -font "-family {DejaVu Sans} -size 14" \
-        -foreground black -text "+" 
-    vTcl:DefineAlias "$site_3_0.but98" "BtnHotKeyAdd" vTcl:WidgetProc "PyMouseMacros" 1
+        -foreground black -text "+"
+    vTcl:DefineAlias "$site_3_0.but98" "btn_hotkey_add" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but99" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdHotkeyDel" \
         -font "-family {DejaVu Sans} -size 14 -weight bold" \
-        -foreground #ff0000 -text "-" 
-    vTcl:DefineAlias "$site_3_0.but99" "BtnHotKeyDel" vTcl:WidgetProc "PyMouseMacros" 1
+        -foreground #ff0000 -text "-"
+    vTcl:DefineAlias "$site_3_0.but99" "btn_hotkey_del" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but90" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdMouseOffset" -font "-family {DejaVu Sans} -size 10" \
-        -foreground black -text "Mouse Offset:" 
-    vTcl:DefineAlias "$site_3_0.but90" "BtnOffset" vTcl:WidgetProc "PyMouseMacros" 1
+        -foreground black -text "Mouse Offset:"
+    vTcl:DefineAlias "$site_3_0.but90" "btn_offset" vTcl:WidgetProc "PyMouseMacros" 1
     entry "$site_3_0.ent95" \
         -background white -font "-family {DejaVu Sans Mono} -size 10" \
         -foreground black -selectbackground #d9d9d9 -selectforeground black \
-        -validate key -validatecommand "validate_number" -width 56 
+        -validate key -validatecommand "validate_number" -width 56
     vTcl:DefineAlias "$site_3_0.ent95" "EntryMPressIntv" vTcl:WidgetProc "PyMouseMacros" 1
     entry "$site_3_0.ent94" \
         -background white -font "-family {DejaVu Sans Mono} -size 10" \
         -foreground black -selectbackground #d9d9d9 -selectforeground black \
-        -validate key -validatecommand "validate_number %P" -width 56 
+        -validate key -validatecommand "validate_number %P" -width 56
     vTcl:DefineAlias "$site_3_0.ent94" "EntryKPressIntv" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but47" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdRepeat" -font "-family {DejaVu Sans} -size 10" \
-        -foreground #000000 -text "Repeat" 
+        -foreground #000000 -text "Repeat"
     vTcl:DefineAlias "$site_3_0.but47" "BtnRepeat" vTcl:WidgetProc "PyMouseMacros" 1
     label "$site_3_0.lab91" \
         -activebackground #d9d9d9 -activeforeground black -anchor w \
         -background #d9d9d9 -compound left \
         -font "-family {DejaVu Sans} -size 10" -foreground black \
-        -relief ridge -text "0,0" 
+        -relief ridge -text "0,0"
     vTcl:DefineAlias "$site_3_0.lab91" "LabelOffset" vTcl:WidgetProc "PyMouseMacros" 1
     entry "$site_3_0.ent48" \
         -background white -font "-family {DejaVu Sans Mono} -size 10" \
         -foreground #000000 -selectbackground #d9d9d9 -selectforeground black \
-        -validate key -validatecommand "validate_number" -width 46 
+        -validate key -validatecommand "validate_number" -width 46
     vTcl:DefineAlias "$site_3_0.ent48" "EntryRepeat" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but89" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdMoveMouse" -font "-family {DejaVu Sans} -size 10" \
-        -foreground black -text "Move Mouse" 
-    vTcl:DefineAlias "$site_3_0.but89" "BtnMoveMouse" vTcl:WidgetProc "PyMouseMacros" 1
+        -foreground black -text "Move Mouse"
+    vTcl:DefineAlias "$site_3_0.but89" "btn_move_mouse" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but93" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdMouseIntv" -font "-family {DejaVu Sans} -size 10" \
-        -foreground black -relief sunken -text "Mouse Press Interval:" 
-    vTcl:DefineAlias "$site_3_0.but93" "BtnMPressIntv" vTcl:WidgetProc "PyMouseMacros" 1
+        -foreground black -relief sunken -text "Mouse Press Interval:"
+    vTcl:DefineAlias "$site_3_0.but93" "btn_mouse_press_intv" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but92" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdKeyIntv" -font "-family {DejaVu Sans} -size 10" \
-        -foreground black -relief sunken -text "Key Press Interval:" 
-    vTcl:DefineAlias "$site_3_0.but92" "BtnKPressIntv" vTcl:WidgetProc "PyMouseMacros" 1
+        -foreground black -relief sunken -text "Key Press Interval:"
+    vTcl:DefineAlias "$site_3_0.but92" "btn_key_press_intv" vTcl:WidgetProc "PyMouseMacros" 1
     place $site_3_0.lab96 \
         -in $site_3_0 -x 0 -relx 0.765 -y 0 -rely 0.255 -width 0 \
         -relwidth 0.129 -height 0 -relheight 0.224 -anchor nw \
-        -bordermode ignore 
+        -bordermode ignore
     place $site_3_0.lab97 \
         -in $site_3_0 -x 0 -relx 0.69 -y 0 -rely 0.255 -width 0 \
         -relwidth 0.074 -height 0 -relheight 0.265 -anchor nw \
-        -bordermode ignore 
+        -bordermode ignore
     place $site_3_0.ent57 \
         -in $site_3_0 -x 0 -relx 0.837 -y 0 -rely 0.631 -width 86 -relwidth 0 \
-        -height 23 -relheight 0 -anchor nw -bordermode ignore 
+        -height 23 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but56 \
         -in $site_3_0 -x 0 -relx 0.684 -y 0 -rely 0.583 -width 111 \
-        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but98 \
         -in $site_3_0 -x 0 -relx 0.891 -y 0 -rely 0.255 -width 31 -relwidth 0 \
-        -height 21 -relheight 0 -anchor nw -bordermode ignore 
+        -height 21 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but99 \
         -in $site_3_0 -x 0 -relx 0.928 -y 0 -rely 0.255 -width 31 -relwidth 0 \
-        -height 21 -relheight 0 -anchor nw -bordermode ignore 
+        -height 21 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but90 \
         -in $site_3_0 -x 0 -relx 0.013 -y 0 -rely 0.194 -width 111 \
-        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.ent95 \
         -in $site_3_0 -x 0 -relx 0.583 -y 0 -rely 0.631 -width 56 -relwidth 0 \
-        -height 23 -relheight 0 -anchor nw -bordermode ignore 
+        -height 23 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.ent94 \
         -in $site_3_0 -x 0 -relx 0.583 -y 0 -rely 0.243 -width 56 -relwidth 0 \
-        -height 23 -relheight 0 -anchor nw -bordermode ignore 
+        -height 23 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but47 \
         -in $site_3_0 -x 0 -relx 0.165 -y 0 -rely 0.583 -width 71 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.lab91 \
         -in $site_3_0 -x 0 -relx 0.025 -y 0 -rely 0.583 -width 0 \
         -relwidth 0.117 -height 0 -relheight 0.252 -anchor nw \
-        -bordermode ignore 
+        -bordermode ignore
     place $site_3_0.ent48 \
         -in $site_3_0 -x 0 -relx 0.266 -y 0 -rely 0.631 -width 46 -relwidth 0 \
-        -height 23 -relheight 0 -anchor nw -bordermode ignore 
+        -height 23 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but89 \
         -in $site_3_0 -x 0 -relx 0.165 -y 0 -rely 0.194 -width 111 \
-        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but93 \
         -in $site_3_0 -x 0 -relx 0.368 -y 0 -rely 0.583 -width 161 \
-        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but92 \
         -in $site_3_0 -x 0 -relx 0.368 -y 0 -rely 0.194 -width 161 \
-        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -relwidth 0 -height 31 -relheight 0 -anchor nw -bordermode ignore
     frame "$top.fra56" \
         -borderwidth 2 -relief groove -background #d9d9d9 -height 49 \
-        -width 259 
+        -width 259
     vTcl:DefineAlias "$top.fra56" "FrameMacroListButtons" vTcl:WidgetProc "PyMouseMacros" 1
     set site_3_0 $top.fra56
     button "$site_3_0.but67" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdMacroAdd" -font "-family {DejaVu Sans} -size 16" \
-        -foreground #000000 -text "+" 
-    vTcl:DefineAlias "$site_3_0.but67" "BtnAddMacro" vTcl:WidgetProc "PyMouseMacros" 1
+        -foreground #000000 -text "+"
+    vTcl:DefineAlias "$site_3_0.but67" "btn_add_macro" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but68" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdMacroDel" \
         -font "-family {DejaVu Sans} -size 16 -weight bold" \
-        -foreground #f20f0f -text "-" 
-    vTcl:DefineAlias "$site_3_0.but68" "BtnDelMacro" vTcl:WidgetProc "PyMouseMacros" 1
+        -foreground #f20f0f -text "-"
+    vTcl:DefineAlias "$site_3_0.but68" "btn_del_macro" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but58" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtnCmdRefresh" -font "-family {DejaVu Sans} -size 10" \
-        -foreground #000000 -text "Refresh" 
+        -foreground #000000 -text "Refresh"
     vTcl:DefineAlias "$site_3_0.but58" "BtnRefresh" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but48" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtnCmdFolder" -font "-family {DejaVu Sans} -size 10" \
-        -foreground #000000 -text "Folder" 
+        -foreground #000000 -text "Folder"
     vTcl:DefineAlias "$site_3_0.but48" "BtnFolder" vTcl:WidgetProc "PyMouseMacros" 1
     place $site_3_0.but67 \
         -in $site_3_0 -x 0 -relx 0.039 -y 0 -rely 0.204 -width 31 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but68 \
         -in $site_3_0 -x 0 -relx 0.196 -y 0 -rely 0.204 -width 31 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but58 \
         -in $site_3_0 -x 0 -relx 0.656 -y 0 -rely 0.204 -width 71 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but48 \
         -in $site_3_0 -x 0 -relx 0.347 -y 0 -rely 0.204 -width 71 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     frame "$top.fra60" \
         -borderwidth 2 -relief groove -background #d9d9d9 -height 49 \
-        -width 787 
+        -width 787
     vTcl:DefineAlias "$top.fra60" "FrameMacroEvtButtons" vTcl:WidgetProc "PyMouseMacros" 1
     set site_3_0 $top.fra60
     button "$site_3_0.but50" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdRestore" -font "-family {DejaVu Sans} -size 10" \
-        -foreground #000000 -text "Restore" 
+        -foreground #000000 -text "Restore"
     vTcl:DefineAlias "$site_3_0.but50" "BtnRestore" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but52" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdPlay" -font "-family {DejaVu Sans} -size 10" \
-        -foreground #000000 -text "Play" 
+        -foreground #000000 -text "Play"
     vTcl:DefineAlias "$site_3_0.but52" "BtnPlay" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but49" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdSave" -font "-family {DejaVu Sans} -size 10" \
-        -foreground #000000 -text "Save" 
+        -foreground #000000 -text "Save"
     vTcl:DefineAlias "$site_3_0.but49" "BtnSave" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but51" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdClear" -font "-family {DejaVu Sans} -size 10" \
-        -foreground #000000 -text "Clear" 
+        -foreground #000000 -text "Clear"
     vTcl:DefineAlias "$site_3_0.but51" "BtnClear" vTcl:WidgetProc "PyMouseMacros" 1
     button "$site_3_0.but61" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -command "BtCmdRecord" -font "-family {DejaVu Sans} -size 10" \
-        -foreground #000000 -text "Record" 
+        -foreground #000000 -text "Record"
     vTcl:DefineAlias "$site_3_0.but61" "BtnRecord" vTcl:WidgetProc "PyMouseMacros" 1
     place $site_3_0.but50 \
         -in $site_3_0 -x 0 -relx 0.888 -y 0 -rely 0.204 -width 71 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but52 \
-        -in $site_3_0 -x 250 -y 10 -anchor nw -bordermode ignore 
+        -in $site_3_0 -x 250 -y 10 -anchor nw -bordermode ignore
     place $site_3_0.but49 \
         -in $site_3_0 -x 0 -relx 0.114 -y 0 -rely 0.204 -width 71 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but51 \
         -in $site_3_0 -x 0 -relx 0.787 -y 0 -rely 0.204 -width 71 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $site_3_0.but61 \
         -in $site_3_0 -x 0 -relx 0.013 -y 0 -rely 0.204 -width 71 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     label "$top.lab59" \
         -activebackground #d9d9d9 -activeforeground black -anchor w \
         -background #d9d9d9 -compound left \
         -font "-family {DejaVu Sans} -size 10" -foreground #000000 \
-        -justify left -relief sunken 
+        -justify left -relief sunken
     vTcl:DefineAlias "$top.lab59" "LbStatusBar" vTcl:WidgetProc "PyMouseMacros" 1
     ###################
     # SETTING GEOMETRY
     ###################
     place $top.scr47 \
         -in $top -x 10 -y 70 -width 267 -relwidth 0 -height 593 -relheight 0 \
-        -anchor nw -bordermode ignore 
+        -anchor nw -bordermode ignore
     place $top.lab100 \
         -in $top -x 280 -y 175 -width 787 -relwidth 0 -height 485 \
-        -relheight 0 -anchor nw -bordermode ignore 
+        -relheight 0 -anchor nw -bordermode ignore
     place $top.lab88 \
         -in $top -x 280 -y 65 -width 789 -relwidth 0 -height 103 -relheight 0 \
-        -anchor nw -bordermode ignore 
+        -anchor nw -bordermode ignore
     place $top.fra56 \
         -in $top -x 10 -y 10 -width 259 -relwidth 0 -height 49 -relheight 0 \
-        -anchor nw -bordermode ignore 
+        -anchor nw -bordermode ignore
     place $top.fra60 \
         -in $top -x 280 -y 10 -width 788 -relwidth 0 -height 49 -relheight 0 \
-        -anchor nw -bordermode ignore 
+        -anchor nw -bordermode ignore
     place $top.lab59 \
         -in $top -x 10 -y 668 -width 1060 -relwidth 0 -height 25 -relheight 0 \
-        -anchor nw -bordermode ignore 
+        -anchor nw -bordermode ignore
 
     vTcl:FireEvent $base <<Ready>>
 }
@@ -402,7 +402,7 @@ proc vTclWindow.top2 {base} {
     # CREATING WIDGETS
     ###################
     vTcl::widgets::core::toplevel::createCmd $top -class Toplevel \
-        -borderwidth 5 -menu $top.m53 -background #d9d9d9 -takefocus 1 
+        -borderwidth 5 -menu $top.m53 -background #d9d9d9 -takefocus 1
     wm focusmodel $top passive
     wm geometry $top 501x182+692+334
     update
@@ -425,18 +425,18 @@ proc vTclWindow.top2 {base} {
         -activebackground #d9d9d9 -activeforeground black -anchor w \
         -background #d9d9d9 -compound center \
         -font "-family {DejaVu Sans} -size 16" -foreground #000000 \
-        -text "Dialog Text" 
+        -text "Dialog Text"
     vTcl:DefineAlias "$top.lab52" "LbDialogText" vTcl:WidgetProc "TLDialog" 1
     vTcl:copy_lock $top.lab52
     button "$top.but54" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
-        -font "-family {DejaVu Sans} -size 10" -foreground #000000 -text "OK" 
+        -font "-family {DejaVu Sans} -size 10" -foreground #000000 -text "OK"
     vTcl:DefineAlias "$top.but54" "BtnDialogOK" vTcl:WidgetProc "TLDialog" 1
     vTcl:copy_lock $top.but54
     button "$top.but55" \
         -activebackground #d9d9d9 -activeforeground black -background #d9d9d9 \
         -font "-family {DejaVu Sans} -size 10" -foreground #000000 \
-        -text "Cancel" 
+        -text "Cancel"
     vTcl:DefineAlias "$top.but55" "BtnDialogCancel" vTcl:WidgetProc "TLDialog" 1
     vTcl:copy_lock $top.but55
     ###################
@@ -444,13 +444,13 @@ proc vTclWindow.top2 {base} {
     ###################
     place $top.lab52 \
         -in $top -x 0 -relx 0.04 -y 0 -rely 0.06 -width 0 -relwidth 0.916 \
-        -height 0 -relheight 0.549 -anchor nw -bordermode ignore 
+        -height 0 -relheight 0.549 -anchor nw -bordermode ignore
     place $top.but54 \
         -in $top -x 0 -relx 0.818 -y 0 -rely 0.714 -width 71 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
     place $top.but55 \
         -in $top -x 0 -relx 0.659 -y 0 -rely 0.714 -width 71 -relwidth 0 \
-        -height 31 -relheight 0 -anchor nw -bordermode ignore 
+        -height 31 -relheight 0 -anchor nw -bordermode ignore
 
     vTcl:FireEvent $base <<Ready>>
 }

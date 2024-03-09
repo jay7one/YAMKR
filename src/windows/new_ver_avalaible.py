@@ -10,7 +10,7 @@ class NewVerAvailable(Popup):
         Label(self, text="Click the button to open releases page on GitHub").pack(side=TOP)
         buttonArea = Frame(self)
         Button(buttonArea, text="Click here to view",
-               command=lambda: OpenUrl("https://github.com/jay7one/PyMouseMacros/releases")).pack(side=LEFT, pady=10)
+               command=lambda: OpenUrl("https://github.com/jay7one/PyMouseMacro/releases")).pack(side=LEFT, pady=10)
         Button(buttonArea, text="Close", command=self.destroy).pack(side=LEFT, padx=10)
         buttonArea.pack(side=BOTTOM, pady=10)
         self.wait_window()

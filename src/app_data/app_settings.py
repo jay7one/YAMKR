@@ -7,7 +7,6 @@ class AppSettings(Settings):
         super().__init__("AppSettings", False, initial_values)
 
     def initial_settings(self):
-        print("Debug init vals")
         return  {
 
             "main_screen": {

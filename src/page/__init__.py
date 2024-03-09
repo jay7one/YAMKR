@@ -1,1 +1,1 @@
-from .PyMouseMacro import PyMouseMacros
+from .PyMouseMacro import PyMouseMacro
