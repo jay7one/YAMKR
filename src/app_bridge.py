@@ -47,10 +47,8 @@ class AppBridge(TkinterHelper):
         self.main_win.FrameMacroListButtons.lift()
 
         saved_geo = self.app_settings.get_main_geo()
-        print(f"debug {saved_geo=}")
         self.set_window_geo(self.root,saved_geo)
-        #self.pymacros_toplevel.geometry(saved_geo)
-        #self.root.geometry(saved_geo)
+
 
         self.root.resizable(0,0)
         self.root.deiconify()
@@ -79,11 +77,6 @@ class AppBridge(TkinterHelper):
     def config_event(self,event):   # pylint: disable=unused-argument
         self.app_settings.set_main_geo(self.get_window_geo(self.root))
 
-
-    def get_menu_idx(self, lbl):
-        menu_idx = self.main_win.menubar.index(lbl)
-        return menu_idx
-
     def menu_callback(self, var_tag, *args):
         #print(f"debug cb {var_tag=}{args=}")
         set_on=None
@@ -95,6 +88,9 @@ class AppBridge(TkinterHelper):
             self.app_settings.set_min_on_play(set_on)
         elif var_tag == 'On Record':
             self.app_settings.set_min_on_record(set_on)
+
+        if var_tag[:3] == "On ":
+            self.sbar_msg(f"Minimize {var_tag} set {'On' if set_on else 'Off'}")
 
 
     def setup_menus(self):
@@ -113,13 +109,6 @@ class AppBridge(TkinterHelper):
                 self.menu_setting_vars[var_tag].set( init_value_fn() )
             else:
                 sub_menu.entryconfig(menu_idx,variable=self.menu_setting_vars[var_tag],  command=lambda  lbl=lbl : self.menu_callback(lbl))
-
-
-        # Menu settings button
-        #self.menu_setting_vars['min_on_play'] = tk.BooleanVar(self.app_settings.get_min_on_play())
-        #self.menu_setting_vars['min_on_record'] = tk.BooleanVar(self.app_settings.get_min_on_record())
-        #self.main_win.menubar.add_command(label="On Play", variable=self.menu_setting_vars['min_on_play'], command=lambda min_on=self.menu_setting_vars['min_on_play'] : self.menu_min_play(min_on))
-        #self.main_win.menubar.add_command(label="On Record", variable=self.menu_setting_vars['min_on_record'], command=lambda min_on=self.menu_setting_vars['min_on_record'] : self.menu_min_record(min_on))
 
     def add_callbacks(self,main_win:PyMouseMacros):
 
@@ -437,11 +426,15 @@ class AppBridge(TkinterHelper):
 
         if not self.selected_macro: return
         self.button_down(self.main_win.BtnRecord)
-        print(f"EC bef:{len(self.selected_macro.events)=}")
-        self.selected_macro.record()
-        print(f"EC aft:{len(self.selected_macro.events)=}")
 
-        print("Loading events")
+        if self.app_settings.get_min_on_record() :
+            self.root.withdraw()
+
+        self.selected_macro.record()
+
+        if self.app_settings.get_min_on_record() :
+            self.root.deiconify()
+
         self.setup_events(self.selected_macro.events)
         self.button_up(self.main_win.BtnRecord)
 

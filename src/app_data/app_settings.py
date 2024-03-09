@@ -51,7 +51,7 @@ class AppSettings(Settings):
 
     def get_main_geo(self):
         settings = self.get_config()
-        print(f"Debug {settings}")
+        #print(f"Debug {settings}")
         return settings["main_screen"]["geo"]
 
     def set_main_geo(self, geo):
