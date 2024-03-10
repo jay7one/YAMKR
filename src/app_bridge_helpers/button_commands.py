@@ -12,12 +12,12 @@ from windows.new_macro_dialog import NewMacroDialog
 from windows.popup_dialog import PopupDialog
 
 class ButtonCommands(ABC, AppBridgeBase):
+
     def set_mouse_offset(self, macro):
         offset_text = f"{macro.global_mouse_offset_x,macro.global_mouse_offset_y}"
         self.main_win.label_offset.configure(text=offset_text, anchor="center")
 
-
-    def entry_toggle(self, entry:tk.Entry, enable):
+    def entry_toggle(self, entry:tk.Entry, enable:bool):
         new_state = 'normal' if enable else 'disabled'
         entry.config(state=new_state)
 
@@ -33,31 +33,30 @@ class ButtonCommands(ABC, AppBridgeBase):
         self.macro_manager.clear_macro(self.selected_macro)
         self.sbar_msg(f"Cleared events for macro: {self.selected_macro.name}")
 
-
-    def btn_cmd_key_intv(self,button):
+    def btn_cmd_key_intv(self,button:tk.Button):
         if self.selected_macro is None: return
         self.selected_macro.global_keypress_interval_on = not self.selected_macro.global_keypress_interval_on
         self.btn_cmd_key_intv_state(button)
 
-    def btn_cmd_key_intv_state(self,button):
+    def btn_cmd_key_intv_state(self,button:tk.Button):
         self.button_toggle(button,self.selected_macro.global_keypress_interval_on)
         self.entry_toggle(self.main_win.entry_k_press_intv, self.selected_macro.global_keypress_interval_on)
 
-    def btn_cmd_mouse_intv(self,button):
+    def btn_cmd_mouse_intv(self,button:tk.Button):
         if self.selected_macro is None: return
         self.selected_macro.global_mousepress_interval_on = not self.selected_macro.global_mousepress_interval_on
         self.btn_cmd_mouse_intv_state(button)
 
-    def btn_cmd_mouse_intv_state(self,button):
+    def btn_cmd_mouse_intv_state(self,button:tk.Button):
         self.button_toggle(button,self.selected_macro.global_mousepress_interval_on)
         self.entry_toggle(self.main_win.entry_m_press_intv, self.selected_macro.global_mousepress_interval_on)
 
-    def btn_cmd_rel_delay(self,button):
+    def btn_cmd_rel_delay(self,button:tk.Button):
         if self.selected_macro is None: return
         self.selected_macro.global_release_interval_on = not self.selected_macro.global_release_interval_on
         self.btn_cmd_rel_delayState(button)
 
-    def btn_cmd_rel_delayState(self,button):
+    def btn_cmd_rel_delayState(self,button:tk.Button):
         self.button_toggle(button,self.selected_macro.global_release_interval_on)
         self.entry_toggle(self.main_win.entry_rel_delay, self.selected_macro.global_release_interval_on)
 
@@ -74,14 +73,14 @@ class ButtonCommands(ABC, AppBridgeBase):
             self.selected_macro.global_repeat = 1
         self.set_entry_text(self.main_win.entry_repeat,self.selected_macro.global_repeat)
 
-    def btn_cmd_mouse_offset(self,button):
+    def btn_cmd_mouse_offset(self,button:tk.Button):
         if self.selected_macro is None: return
         self.button_down(button)
         self.selected_macro.global_mouse_offset_x,self.selected_macro.global_mouse_offset_y = MouseClick.get_next_click()
         self.button_up(button)
         self.set_mouse_offset(self.selected_macro)
 
-    def btn_cmd_move_mouse(self,button):
+    def btn_cmd_move_mouse(self,button:tk.Button):
         if self.selected_macro is None: return
         self.selected_macro.global_mouse_movement = not self.selected_macro.global_mouse_movement
         self.button_toggle(button,self.selected_macro.global_mouse_movement)
@@ -91,7 +90,7 @@ class ButtonCommands(ABC, AppBridgeBase):
         self.selected_macro.assign_hotkey("")
         self.main_win.lb_hotkey_text['text']=""
 
-    def btn_cmd_hotkey_add(self,button):
+    def btn_cmd_hotkey_add(self,button:tk.Button):
         if self.selected_macro is None: return
 
         HotKey.add_hotkey(
@@ -100,7 +99,6 @@ class ButtonCommands(ABC, AppBridgeBase):
             self.main_win.btn_hotkey_add,
             self.set_hotkey_callback
             )
-
 
     def set_hotkey_callback(self):
         new_hotkey = self.main_win.lb_hotkey_text['text']
@@ -179,11 +177,11 @@ class ButtonCommands(ABC, AppBridgeBase):
     def load_macro_list(self, refresh=False):
         print("Fn : load_macro_list not overrriden")
     @abstractmethod
-    def macro_select(self,value):
+    def macro_select(self,macro_name:str):
         print("Fn : macro_select not overrriden")
     @abstractmethod
     def setup_events(self,macro_events:list[MacroEvent]):
         print("Fn : setup_events not overrriden")
     @abstractmethod
-    def load_selected_macro(self, macro_name):
+    def load_selected_macro(self, macro_name:str):
         print("Fn : load_selected_macro not overrriden")

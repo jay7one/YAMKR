@@ -32,14 +32,13 @@ class AppSettings(Settings):
             }
         }
 
-    def set_min_on(self, min_setting, min_on):
+    def set_min_on(self, min_setting:str, min_on:bool):
         settings = self.get_config()
         settings["Minimization"][min_setting] = min_on
         self.save_dict(settings)
 
-    def get_min_on(self, min_setting):
+    def get_min_on(self, min_setting:str) -> bool:
         is_on = self.get_config()["Minimization"][min_setting]
-        #print(f"Debug is ok {min_setting=} : {is_on=}")
         return is_on
 
     def set_min_on_record(self,min_on): self.set_min_on(self.MIN_ON_RECPORD, min_on)
@@ -48,12 +47,11 @@ class AppSettings(Settings):
     def get_min_on_record(self): return self.get_min_on(self.MIN_ON_RECPORD)
     def get_min_on_play(self):   return self.get_min_on(self.MIN_ON_PLAY)
 
-    def get_main_geo(self):
+    def get_main_geo(self) -> str:
         settings = self.get_config()
-        #print(f"Debug {settings}")
         return settings["main_screen"]["geo"]
 
-    def set_main_geo(self, geo):
+    def set_main_geo(self, geo:str):
         settings = self.get_config()
         settings["main_screen"]["geo"] = geo
         self.save_dict(settings)

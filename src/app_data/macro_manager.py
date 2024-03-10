@@ -17,37 +17,36 @@ class MacroManager(Settings):
             os.mkdir(self.macros_path)
         self.update_macro_list()
 
-
     def update_macro_list(self):
         macro_list = self.get_macro_list()
         self.reset_settings()
         for k,v in macro_list.items():
             self.change_settings(MacroManager.CONTENT, option=k, new_value=v)
 
-    def find_hotkey_macro(self,hotkey):
+    def find_hotkey_macro(self,hotkey:str) -> Macro:
         for key, value in self.hotkey_list.items():
             if key == hotkey: return value
         return None
 
-    def update_hotkey_list(self, name, hotkey):
+    def update_hotkey_list(self, name:str, hotkey:str):
         if hotkey == "":    self.remove_hotkey(name)
         else:               self.hotkey_list[hotkey] = name
 
-    def remove_hotkey(self,name):
+    def remove_hotkey(self,name:str):
         for key, value in self.hotkey_list.items():
             if value == name:
                 del self.hotkey_list[key]
                 return
 
-    def macro_exists(self, macro_name):
+    def macro_exists(self, macro_name:str) -> bool:
         return macro_name in self.get_setting(MacroManager.CONTENT).keys()
 
-    def refresh_hotkey(self, macro_name):
+    def refresh_hotkey(self, macro_name:str) -> str:
         hotkey = Macro.get_hotkey(macro_name, self.macros_path)
         self.update_hotkey_list(macro_name, hotkey)
         return hotkey
 
-    def get_macro_list(self):
+    def get_macro_list(self) -> dict:
         mac_files = dict()
         for root, _, _ in os.walk(self.macros_path):
             for file in glob.glob(os.path.join(root, '*' + MACRO_EXT)):
@@ -56,13 +55,13 @@ class MacroManager(Settings):
                 #print(f"Found {file=}")
         return mac_files
 
-    def get_macro_fullpath(self, name):
+    def get_macro_fullpath(self, name:str) -> str:
         return os.path.join(self.dir_path, self.CONTENT, name + MACRO_EXT  )
 
-    def initial_settings(self):
+    def initial_settings(self) -> dict:
         return {MacroManager.CONTENT: {} }
 
-    def remove_macro(self, macro_name):
+    def remove_macro(self, macro_name:str) -> None:
         settings = self.get_config()
         macro_path = self.get_macro_fullpath(macro_name)
         self.remove_hotkey(macro_name)
@@ -70,7 +69,7 @@ class MacroManager(Settings):
         os.remove(macro_path)
         self.save_settings(json.dumps(settings, indent=4))
 
-    def rename_macro(self, macro:Macro , new_name):
+    def rename_macro(self, macro:Macro , new_name:str) -> None:
         settings = self.get_config()
         macro_path = self.get_macro_fullpath(macro.name)
         self.remove_hotkey(macro.name)
@@ -83,7 +82,7 @@ class MacroManager(Settings):
         settings[MacroManager.CONTENT][new_name] = macro.hotkey
         self.save_settings(json.dumps(settings, indent=4))
 
-    def new_macro(self,name,hotkey):
+    def new_macro(self,name:str,hotkey:str) -> Macro:
         new_mac = Macro(name,[])
         new_mac.hotkey = hotkey
         self.save_macro(new_mac)
@@ -100,15 +99,15 @@ class MacroManager(Settings):
     def clear_macro(self,macro:Macro ):
         macro.clear()
 
-    def get_macros(self):
+    def get_macros(self) -> dict:
         return self.get_setting(MacroManager.CONTENT)
 
-    def get_macro_names(self, refresh=False):
+    def get_macro_names(self, refresh=False) -> list[str]:
         if refresh:
             self.update_macro_list()
         return sorted(self.get_setting(MacroManager.CONTENT).keys(), key=str.casefold)
 
-    def load_macro(self, name):
+    def load_macro(self, name) -> Macro:
         macro = Macro.from_file(self.get_macro_fullpath(name))
         #print(f"Loaded Macro {name} events:{len(macro.events)}")
         return macro

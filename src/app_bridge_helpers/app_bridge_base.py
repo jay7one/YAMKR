@@ -18,6 +18,6 @@ class AppBridgeBase(TkinterHelper):
         self.selected_macro:Macro = None
         self.menu_setting_vars = {}
 
-    def sbar_msg(self,msg):
+    def sbar_msg(self,msg) -> None:
         self.main_win.lb_status_bar['text'] = msg
-        #print(f"debug:{msg=}")
+

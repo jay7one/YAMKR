@@ -178,8 +178,6 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.macro_manager.save_macro(macro)
         self.sbar_msg(f"Saved macro: {self.selected_macro.name}")
 
-
-
     def setup_events(self,macro_events:list[MacroEvent]):   # pylint: disable=unused-argument
 
         self.clear_evt_labels()
@@ -207,16 +205,16 @@ class AppBridge(ButtonCommands, MenuCommands):
 
             label.grid(row=row, column=col, sticky="w", padx=5, pady=5)
 
-    def macro_select(self,value):
+    def macro_select(self,macro_name:str):
         listbox = self.main_win.slbox_macro_list
         items = listbox.get(0, tk.END)
         try:
-            index = items.index(value)
+            index = items.index(macro_name)
             listbox.selection_clear(0, tk.END)
             listbox.selection_set(index)
             listbox.see(index)  # Ensure the selected item is visible
         except ValueError:
-            return None
+            pass
 
     # TODO: Funcion Key listener
 
