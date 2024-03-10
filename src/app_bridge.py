@@ -1,31 +1,20 @@
-import inspect
-#import time
 import tkinter as tk
 
 from page.PyMouseMacro import PyMouseMacro,TLDialog
 from app_data.macro_manager import MacroManager
 from app_data.app_settings import AppSettings
 from macros import Macro
-from macros.macro import MacroEvent, MACRO_EXT#,EventType
-from helpers.mouse_click import MouseClick
-from helpers.hot_key import HotKey
-from helpers.file_explorer import FileExplorer
-from windows.new_macro_dialog import NewMacroDialog
-from windows.popup_dialog import PopupDialog
-from windows.tab_order_manager import TabOrderManager
-from windows.event_widget import EventWidget
-from windows.tkinter_helper import TkinterHelper
+from macros.macro import MacroEvent
+from app_bridge_helpers.tab_order_manager import TabOrderManager
+from app_bridge_helpers.event_widget import EventWidget
+from app_bridge_helpers.button_commands import ButtonCommands
+from app_bridge_helpers.menu_commands import MenuCommands
 
-class AppBridge(TkinterHelper):
-    root=None
-    pymacros_toplevel, pymacros_win = None,None
-    dialog_toplevel, dialog_win = None,None
-    app_bridge = None
-
-    menu_setting_vars = {}
+class AppBridge(ButtonCommands, MenuCommands):
 
     def __init__(self, main_win:PyMouseMacro, dialog_win:TLDialog) -> None:
         super().__init__()
+
         self.main_win = main_win
         self.dialog_win = dialog_win
 
@@ -77,44 +66,10 @@ class AppBridge(TkinterHelper):
     def config_event(self,event):   # pylint: disable=unused-argument
         self.app_settings.set_main_geo(self.get_window_geo(self.root))
 
-    def menu_callback(self, var_tag, *args):
-        #print(f"debug cb {var_tag=}{args=}")
-        set_on=None
-        if args:
-            bv:tk.BooleanVar = args[0]
-            set_on = bv.get()
-
-        if var_tag == 'On Play':
-            self.app_settings.set_min_on_play(set_on)
-        elif var_tag == 'On Record':
-            self.app_settings.set_min_on_record(set_on)
-
-        if var_tag[:3] == "On ":
-            self.sbar_msg(f"Minimize {var_tag} set {'On' if set_on else 'Off'}")
-
-
-    def setup_menus(self):
-        menu_defs = {
-            # Label,  Var_Tag, fn
-            "On Play":      ('min_on_play',     self.app_settings.get_min_on_play       , self.main_win.sub_menu),
-            "On Record":    ('min_on_record',   self.app_settings.get_min_on_record     , self.main_win.sub_menu)
-        }
-        for lbl, values in menu_defs.items():
-            var_tag, init_value_fn, sub_menu = values
-            menu_idx = sub_menu.index(lbl)
-
-            if var_tag :
-                self.menu_setting_vars[var_tag] = tk.BooleanVar()
-                sub_menu.entryconfig(menu_idx,variable=self.menu_setting_vars[var_tag],  command=lambda v=self.menu_setting_vars[var_tag], lbl=lbl : self.menu_callback(lbl,v) )
-                self.menu_setting_vars[var_tag].set( init_value_fn() )
-            else:
-                sub_menu.entryconfig(menu_idx,variable=self.menu_setting_vars[var_tag],  command=lambda  lbl=lbl : self.menu_callback(lbl))
-
     def add_callbacks(self,main_win:PyMouseMacro):
 
         main_win.slbox_macro_list.bind("<<ListboxSelect>>", self.macro_list_callback)
         self.root.bind("<Configure>",self.config_event)
-
 
         self.setup_menus()
 
@@ -174,10 +129,6 @@ class AppBridge(TkinterHelper):
         self.update_macro_screen()
         self.sbar_msg(f"Loaded macro: {self.selected_macro.name}")
 
-    def set_entry_text(self, tk_entry:tk.Entry,text):
-        tk_entry.delete(0,tk.END)
-        tk_entry.insert(0,text)
-        return
 
     def update_macro_screen(self):
 
@@ -208,11 +159,6 @@ class AppBridge(TkinterHelper):
         self.set_mouse_offset(macro)
         self.setup_events(macro.events)
 
-    def get_entry_int(self, entry:tk.Entry):
-        text = entry.get()
-        if text == "" : return 0
-        return int(text)
-
     def mouse_offset(self):
         txtstr = self.main_win.label_offset['text']
         parts = txtstr[1:len(txtstr)-1].split(",")
@@ -232,9 +178,7 @@ class AppBridge(TkinterHelper):
         self.macro_manager.save_macro(macro)
         self.sbar_msg(f"Saved macro: {self.selected_macro.name}")
 
-    def set_mouse_offset(self, macro):
-        offset_text = f"{macro.global_mouse_offset_x,macro.global_mouse_offset_y}"
-        self.main_win.label_offset.configure(text=offset_text, anchor="center")
+
 
     def setup_events(self,macro_events:list[MacroEvent]):   # pylint: disable=unused-argument
 
@@ -263,118 +207,6 @@ class AppBridge(TkinterHelper):
 
             label.grid(row=row, column=col, sticky="w", padx=5, pady=5)
 
-
-    def entry_toggle(self, entry:tk.Entry, enable):
-        new_state = 'normal' if enable else 'disabled'
-        entry.config(state=new_state)
-
-    def clear_evt_labels(self):
-        #self.main_win.swin_events.delete("all")
-        for l in self.main_win.swin_events.children.values():
-            l.grid_forget()
-
-    def btn_cmd_clear(self):
-        if not self.selected_macro:
-            return
-        self.clear_evt_labels()
-        self.macro_manager.clear_macro(self.selected_macro)
-        self.sbar_msg(f"Cleared events for macro: {self.selected_macro.name}")
-
-
-    def btn_cmd_key_intv(self,button):
-        if self.selected_macro is None: return
-        self.selected_macro.global_keypress_interval_on = not self.selected_macro.global_keypress_interval_on
-        self.btn_cmd_key_intv_state(button)
-
-    def btn_cmd_key_intv_state(self,button):
-        self.button_toggle(button,self.selected_macro.global_keypress_interval_on)
-        self.entry_toggle(self.main_win.entry_k_press_intv, self.selected_macro.global_keypress_interval_on)
-
-    def btn_cmd_mouse_intv(self,button):
-        if self.selected_macro is None: return
-        self.selected_macro.global_mousepress_interval_on = not self.selected_macro.global_mousepress_interval_on
-        self.btn_cmd_mouse_intv_state(button)
-
-    def btn_cmd_mouse_intv_state(self,button):
-        self.button_toggle(button,self.selected_macro.global_mousepress_interval_on)
-        self.entry_toggle(self.main_win.entry_m_press_intv, self.selected_macro.global_mousepress_interval_on)
-
-    def btn_cmd_rel_delay(self,button):
-        if self.selected_macro is None: return
-        self.selected_macro.global_release_interval_on = not self.selected_macro.global_release_interval_on
-        self.btn_cmd_rel_delayState(button)
-
-    def btn_cmd_rel_delayState(self,button):
-        self.button_toggle(button,self.selected_macro.global_release_interval_on)
-        self.entry_toggle(self.main_win.entry_rel_delay, self.selected_macro.global_release_interval_on)
-
-    # pylint: disable=unused-argument
-
-    def btn_cmd_repeat(self,*args):
-        if self.selected_macro is None: return
-        self.selected_macro.global_repeat += 1
-        self.btn_cmd_repeatState()
-
-    def btn_cmd_repeatState(self):
-        if self.selected_macro is None: return
-        if self.selected_macro.global_repeat < 1 :
-            self.selected_macro.global_repeat = 1
-        self.set_entry_text(self.main_win.entry_repeat,self.selected_macro.global_repeat)
-
-    def btn_cmd_mouse_offset(self,button):
-        if self.selected_macro is None: return
-        self.button_down(button)
-        self.selected_macro.global_mouse_offset_x,self.selected_macro.global_mouse_offset_y = MouseClick.get_next_click()
-        self.button_up(button)
-        self.set_mouse_offset(self.selected_macro)
-
-    def btn_cmd_move_mouse(self,button):
-        if self.selected_macro is None: return
-        self.selected_macro.global_mouse_movement = not self.selected_macro.global_mouse_movement
-        self.button_toggle(button,self.selected_macro.global_mouse_movement)
-
-    def btn_cmd_hotkey_del(self,*args):
-        if self.selected_macro is None: return
-        self.selected_macro.assign_hotkey("")
-        self.main_win.lb_hotkey_text['text']=""
-
-    def btn_cmd_hotkey_add(self,button):
-        if self.selected_macro is None: return
-
-        HotKey.add_hotkey(
-            self.root,
-            self.main_win.lb_hotkey_text,
-            self.main_win.btn_hotkey_add,
-            self.set_hotkey_callback
-            )
-
-
-    def set_hotkey_callback(self):
-        new_hotkey = self.main_win.lb_hotkey_text['text']
-
-        if new_hotkey == "":
-            new_hotkey = self.selected_macro.hotkey
-        else:
-            self.selected_macro.hotkey = new_hotkey
-
-        self.main_win.lb_hotkey_text['text'] = self.selected_macro.hotkey
-
-
-
-    def btn_cmd_macro_add(self,*args):
-        name, hotkey = NewMacroDialog.create_macro(self.root)
-        if not name : return
-        new_name = name
-        #print(f"BtnAdd:{new_name=}")
-        for i in range(1,999):
-            if not self.macro_manager.macro_exists(new_name):
-                break
-            new_name = name + f"_{i}"
-
-        self.macro_manager.new_macro(new_name,hotkey)
-        self.load_macro_list()
-        self.macro_select(new_name)
-
     def macro_select(self,value):
         listbox = self.main_win.slbox_macro_list
         items = listbox.get(0, tk.END)
@@ -386,76 +218,19 @@ class AppBridge(TkinterHelper):
         except ValueError:
             return None
 
-
-    def btn_cmd_macro_del(self,*args):
-        if self.selected_macro is None:
-            return
-        confirmed = PopupDialog.popup(self.pymacros_toplevel,"Delete Macro",
-                                   f"Confirm deletion of {self.selected_macro.name}.",enable_cancel=True)
-        if confirmed:
-            self.macro_manager.remove_macro(self.selected_macro.name)
-
-        self.load_macro_list()
-
-    def btn_cmd_folder(self,*args):
-        name = None
-        if self.selected_macro: name = self.selected_macro.name+MACRO_EXT
-        FileExplorer.open(self.macro_manager.macros_path,name)
-
-    def btn_cmd_refresh(self,*args):
-        name = None if not self.selected_macro else self.selected_macro.name
-        self.load_macro_list(refresh=True)
-        if name: self.macro_select(name)
-
-    def btn_cmd_restore(self,*args):
-        if not self.selected_macro:
-            return
-        self.load_selected_macro(self.selected_macro.name)
-
-    def btn_cmd_save(self,*args):
-        if self.selected_macro:
-            self.save_selected_macro()
-
-    # TODO: Buttons
-
-    def btn_cmd_play(self,*args):
-        print(f"fn called:{inspect.currentframe().f_code.co_name} {args=}")
-
-    def btn_cmd_record(self,*args):
-
-        if not self.selected_macro: return
-        self.button_down(self.main_win.btn_record)
-
-        if self.app_settings.get_min_on_record() :
-            self.root.withdraw()
-
-        self.selected_macro.record()
-
-        if self.app_settings.get_min_on_record() :
-            self.root.deiconify()
-
-        self.setup_events(self.selected_macro.events)
-        self.button_up(self.main_win.btn_record)
-
-        # TODO: Disable frame and renable after recording
-
-
     # TODO: Funcion Key listener
 
     def get_text(self,entry_field):
         #return entry_field.get("1.0",'end-1c')
         return entry_field.get()
 
-    def validate_repeat_callback(self,*args) -> bool:
+    def validate_repeat_callback(self,*args) -> bool:       # pylint: disable=unused-argument
         e = self.main_win.entry_repeat
         p_str = self.get_text(e)
         if p_str == "" or p_str == "0":
             self.set_entry_text(e,"1")
         return True
 
-    def sbar_msg(self,msg):
-        self.main_win.lb_status_bar['text'] = msg
-        #print(f"debug:{msg=}")
 
     @classmethod
     def main(cls):

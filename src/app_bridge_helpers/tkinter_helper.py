@@ -59,6 +59,18 @@ class TkinterHelper:
     def button_toggle(button, down):  button.config(relief=tk.SUNKEN if down else tk.RAISED)
 
     @staticmethod
+    def get_entry_int(entry:tk.Entry):
+        text = entry.get()
+        if text == "" : return 0
+        return int(text)
+
+    @staticmethod
+    def set_entry_text(tk_entry:tk.Entry,text):
+        tk_entry.delete(0,tk.END)
+        tk_entry.insert(0,text)
+        return
+
+    @staticmethod
     def validate_number(P) -> bool:
         #print(f"Validate {P=}")
         p_str = str(P)
