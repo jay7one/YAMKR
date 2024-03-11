@@ -28,9 +28,16 @@ class AppSettings(Settings):
 
             "Others": {
                 "Check_update": True,
-                "Fixed_timestamp": 0
+                "Fixed_timestamp": 0,
+                "Version": 0
             }
+
         }
+
+    def set_version(self,version):
+        settings = self.get_config()
+        settings["Others"]['Version'] = version
+        self.save_dict(settings)
 
     def set_min_on(self, min_setting:str, min_on:bool):
         settings = self.get_config()

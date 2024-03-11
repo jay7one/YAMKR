@@ -32,8 +32,8 @@ class TkinterHelper:
             if isinstance(widget, tk.Toplevel):
                 x, y = widget.winfo_x(), widget.winfo_y()
                 widget.geometry(f"+{x}+{y}")  # Set geometry to current position
-            else:
-                print(f"Not doing {widget=}")
+            #else:
+            #    print(f"Not doing {widget=}")
         except tk.TclError:
             print(f"Passing {widget=}")
 

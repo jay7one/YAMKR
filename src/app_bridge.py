@@ -10,9 +10,18 @@ from app_bridge_helpers.event_widget import EventWidget
 from app_bridge_helpers.button_commands import ButtonCommands
 from app_bridge_helpers.menu_commands import MenuCommands
 
+# TODO: Version number for releases
+# TODO: Help menu
+# TODO: Menu settings - restore window location
+# TODO: Fonts and sizes in settings
+# TODO: Macro menu - combine macros to new (bluestacks) ( soft link or deep copy ) (adjust for offsets)
+# TODO: Copy paste events - adjusting offsets
+# TODO: requirements file
+
+
 class AppBridge(ButtonCommands, MenuCommands):
 
-    def __init__(self, main_win:PyMouseMacro, dialog_win:TLDialog) -> None:
+    def __init__(self, main_win:PyMouseMacro, dialog_win:TLDialog, version) -> None:
         super().__init__()
 
         self.main_win = main_win
@@ -20,6 +29,8 @@ class AppBridge(ButtonCommands, MenuCommands):
 
         self.app_settings = AppSettings()
         self.macro_manager = MacroManager()
+
+        self.app_settings.set_version(version)
 
         self.add_callbacks(main_win)
         self.load_macro_list()
@@ -251,7 +262,7 @@ class AppBridge(ButtonCommands, MenuCommands):
 
 
     @classmethod
-    def main(cls):
+    def main(cls, version):
         '''Main entry point for the application.'''
 
         cls.root = tk.Tk()
@@ -268,8 +279,8 @@ class AppBridge(ButtonCommands, MenuCommands):
 
         cls.pymacros_toplevel.update()
 
-        cls.app_bridge = AppBridge(cls.pymacros_win,cls.dialog_win)
+        cls.app_bridge = AppBridge(cls.pymacros_win,cls.dialog_win, version)
         cls.root.mainloop()
 
 if __name__ == '__main__':
-    AppBridge.main()
+    AppBridge.main(version=0)

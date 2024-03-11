@@ -32,7 +32,7 @@ class Settings(ABC, metaclass=SingletonABCMeta):
 
     @abstractmethod
     def initial_settings(self):
-        print("Initial settings base")
+        #print("Initial settings base")
         return {}
 
     def init_settings(self, default_values):
