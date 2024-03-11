@@ -9,6 +9,7 @@ from app_bridge_helpers.tab_order_manager import TabOrderManager
 from app_bridge_helpers.event_widget import EventWidget
 from app_bridge_helpers.button_commands import ButtonCommands
 from app_bridge_helpers.menu_commands import MenuCommands
+from helpers.version import Version
 
 # TODO: Version number for releases
 # TODO: Help menu
@@ -21,7 +22,7 @@ from app_bridge_helpers.menu_commands import MenuCommands
 
 class AppBridge(ButtonCommands, MenuCommands):
 
-    def __init__(self, main_win:PyMouseMacro, dialog_win:TLDialog, version) -> None:
+    def __init__(self, main_win:PyMouseMacro, dialog_win:TLDialog) -> None:
         super().__init__()
 
         self.main_win = main_win
@@ -30,7 +31,8 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.app_settings = AppSettings()
         self.macro_manager = MacroManager()
 
-        self.app_settings.set_version(version)
+
+        self.app_settings.set_version(Version.get())
 
         self.add_callbacks(main_win)
         self.load_macro_list()
@@ -283,4 +285,4 @@ class AppBridge(ButtonCommands, MenuCommands):
         cls.root.mainloop()
 
 if __name__ == '__main__':
-    AppBridge.main(version=0)
+    AppBridge.main()

@@ -1,7 +1,11 @@
-import requests
+import os
+import inspect
+from urllib.request import urlopen
 from requests.exceptions import RequestException
 
 class Version:
+    VERSION_FILE="version.txt"
+
     def __init__(self, userSettings):
         self.version = "1.1.11"
         self.new_version = ""
@@ -10,17 +14,29 @@ class Version:
         else:
             self.update = "Check update disabled"
 
-    def checkVersion(self):
-        ver_url = f'https://raw.githubusercontent.com/jay7one/PyMouseMacros/main/version.txt'
+    @classmethod
+    def from_github(cls):
+        ver_url = f'https://raw.githubusercontent.com/jay7one/PyMouseMacros/main/{cls.VERSION_FILE}'
 
+        print(f"Ver url :{ver_url}")
         try:
-            response = requests.get(ver_url)
+            data = urlopen(ver_url)
+            print(f"{data=}")
+            return float(data)
 
-            if response.status_code == 200:
-                release_data = response.json()
-                self.new_version = release_data['tag_name'].replace('v', '')
-                return "Outdated" if self.new_version != self.version else "Up to Date"
-            else:
-                return "Cannot fetch if new update"
         except RequestException:
-            return "Cannot fetch if new update"
+            return 0
+
+    @classmethod
+    def from_file(cls):
+        script_path = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        ver_file = os.path.join(os.path.dirname(os.path.dirname(script_path)),cls.VERSION_FILE)
+
+        with open(ver_file, encoding='utf-8') as vfile:
+            version = float(vfile.readline().rstrip())
+
+        return version
+
+if __name__ == '__main__':
+    print(f"Ver from file : {Version.from_file()}")
+    print(f"Ver in gh: {Version.from_github()}")
