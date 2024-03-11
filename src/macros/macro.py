@@ -88,7 +88,7 @@ class Macro(MacroData, MacroEventManager):
         self.play_macro(self.events,self)
 
     def record(self):
-        offsets = (self.global_mouse_offset_x, self.global_mouse_offset_y, )
+        offsets = (self.global_mouse_offset_x, self.global_mouse_offset_y )
         self.events.extend(self.record_macro(offsets))
 
 class TestMacroConversion(unittest.TestCase):

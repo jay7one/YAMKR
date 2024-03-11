@@ -23,7 +23,7 @@ class MacroManager(Settings):
         for k,v in macro_list.items():
             self.change_settings(MacroManager.CONTENT, option=k, new_value=v)
 
-    def find_hotkey_macro(self,hotkey:str) -> Macro:
+    def find_hotkey_macro(self,hotkey:str) -> str:
         for key, value in self.hotkey_list.items():
             if key == hotkey: return value
         return None

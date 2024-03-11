@@ -58,18 +58,39 @@ class AppBridge(ButtonCommands, MenuCommands):
 
     def load_macro_list(self, refresh=False):
         self.main_win.slbox_macro_list.delete(0,tk.END)
+        cur_selection = None
 
         for idx, macro_name in enumerate(self.macro_manager.get_macro_names(refresh)):
             #print(f"Adding {macro_name}")
             self.main_win.slbox_macro_list.insert(idx,macro_name)
+            if self.selected_macro and self.selected_macro.name == macro_name:
+                cur_selection = macro_name
+
+        if cur_selection:
+            self.select_load_macro(cur_selection)
+        else:
+            self.selected_macro = None
+
+
 
     def config_event(self,event):   # pylint: disable=unused-argument
         self.app_settings.set_main_geo(self.get_window_geo(self.root))
+
+    def check_for_hotkey(self, event:tk.Event):
+        hotkey = event.keysym
+        if hotkey[0] == "F":
+            macro_name = self.macro_manager.find_hotkey_macro(hotkey)
+            if macro_name:
+                self.select_load_macro(macro_name)
+                self.main_win.btn_play.invoke()
+
+        #print(f"debug {(event.keycode, event.keysym, event.char)=}")
 
     def add_callbacks(self,main_win:PyMouseMacro):
 
         main_win.slbox_macro_list.bind("<<ListboxSelect>>", self.macro_list_callback)
         self.root.bind("<Configure>",self.config_event)
+        self.root.bind("<Key>", self.check_for_hotkey )
 
         self.setup_menus()
 
@@ -122,9 +143,9 @@ class AppBridge(ButtonCommands, MenuCommands):
         index = selection[0]
         macro_name =  event.widget.get(index)
         self.main_win.swin_events.delete("all")
-        self.load_selected_macro(macro_name)
+        self.select_load_macro(macro_name)
 
-    def load_selected_macro(self, macro_name):
+    def select_load_macro(self, macro_name):
         self.selected_macro = self.macro_manager.load_macro(macro_name)
         self.update_macro_screen()
         self.sbar_msg(f"Loaded macro: {self.selected_macro.name}")
@@ -213,10 +234,9 @@ class AppBridge(ButtonCommands, MenuCommands):
             listbox.selection_clear(0, tk.END)
             listbox.selection_set(index)
             listbox.see(index)  # Ensure the selected item is visible
+            self.select_load_macro(macro_name)
         except ValueError:
             pass
-
-    # TODO: Funcion Key listener
 
     def get_text(self,entry_field):
         #return entry_field.get("1.0",'end-1c')

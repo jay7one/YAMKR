@@ -37,6 +37,8 @@ class NewMacroDialog:
         dialog.transient(parent_window)
         dialog.grab_set()
 
+        macro_name_entry.focus()
+
         # Make the dialog modal
         dialog.wait_window(dialog)
 
@@ -48,20 +50,14 @@ class NewMacroDialog:
 
     @classmethod
     def _validate_hotkey(cls, input_text, changed_text):
-        print(f"valid:{input_text=}")
         if input_text in ["","F"]:
             return True
-
         if not changed_text.isdigit():
             return False
-
         fnum = int(input_text[1:])
-
         if 1 <= fnum <= 12:
             return True
-
         return False
-
 
     @classmethod
     def _return(cls, dialog, entered_macro_name, entered_hotkey):

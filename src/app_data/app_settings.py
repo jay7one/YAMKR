@@ -15,8 +15,8 @@ class AppSettings(Settings):
             },
 
             "Minimization": {
-                self.MIN_ON_PLAY: False,
-                self.MIN_ON_RECPORD: False,
+                self.MIN_ON_PLAY: True,
+                self.MIN_ON_RECPORD: True,
             },
 
             "Run_On_StartUp": False,

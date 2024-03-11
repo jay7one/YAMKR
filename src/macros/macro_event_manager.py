@@ -1,8 +1,10 @@
 import time
 import threading
 
-from pynput.keyboard import Controller as KeyboardController, Listener as KeyboardListener, Key
+from pynput.keyboard import Controller as KeyboardController
+from pynput.keyboard import Listener as KeyboardListener, Key
 from pynput.mouse import Controller as MouseController
+
 from macros.macro_event import MacroEvent, EventType
 from macros.macro_event_recorder import MacroEventRecorder
 from macros.macro_data import MacroData
@@ -11,17 +13,22 @@ from helpers.pynput_map import PynputMap
 class MacroEventManager(MacroEventRecorder):
     def __init__(self):
         super().__init__()
-        self.keyboard_controller = KeyboardController()
-        self.mouse_controller = MouseController()
+        self.keyboard_controller = None
+        self.mouse_controller = None
         self.playback_kb_listener = None
-        self.stop_playback_event = threading.Event()
+        self.stop_playback_event = None
 
     def sleep_if(self, sleep_on, sleep_ms):
         if sleep_on: time.sleep(sleep_ms/1000)
 
     def play_macro(self, macro_events:list[MacroEvent], macro:MacroData):
+
+        self.keyboard_controller = KeyboardController()
+        self.mouse_controller = MouseController()
+        self.stop_playback_event = threading.Event()
+
         repeat_count = 0
-        print("Starting playback")
+
         while repeat_count < macro.global_repeat:
             repeat_count += 1
             if self.stop_playback_event.is_set():

@@ -1,4 +1,3 @@
-import inspect
 from abc import ABC, abstractmethod
 import tkinter as tk
 
@@ -59,6 +58,14 @@ class ButtonCommands(ABC, AppBridgeBase):
     def btn_cmd_rel_delayState(self,button:tk.Button):
         self.button_toggle(button,self.selected_macro.global_release_interval_on)
         self.entry_toggle(self.main_win.entry_rel_delay, self.selected_macro.global_release_interval_on)
+
+    def btn_bold_on_modify(self, modified):
+        for btn in [self.main_win.btn_save, self.main_win.btn_restore]:
+            if modified:
+                btn.config(foreground='red')
+            else:
+                btn.config(foreground='black')
+
 
     # pylint: disable=unused-argument
 
@@ -131,6 +138,7 @@ class ButtonCommands(ABC, AppBridgeBase):
                                    f"Confirm deletion of {self.selected_macro.name}.",enable_cancel=True)
         if confirmed:
             self.macro_manager.remove_macro(self.selected_macro.name)
+            self.clear_evt_labels()
 
         self.load_macro_list()
 
@@ -147,14 +155,26 @@ class ButtonCommands(ABC, AppBridgeBase):
     def btn_cmd_restore(self,*args):
         if not self.selected_macro:
             return
-        self.load_selected_macro(self.selected_macro.name)
+        self.select_load_macro(self.selected_macro.name)
 
     def btn_cmd_save(self,*args):
         if self.selected_macro:
             self.save_selected_macro()
+        self.btn_bold_on_modify(False)
 
     def btn_cmd_play(self,*args):
-        print(f"fn called:{inspect.currentframe().f_code.co_name} {args=}")
+        if not self.selected_macro: return
+        self.button_down(self.main_win.btn_play)
+
+        if self.app_settings.get_min_on_play() :
+            self.root.withdraw()
+
+        self.selected_macro.play()
+
+        if self.app_settings.get_min_on_play() :
+            self.root.deiconify()
+
+        self.button_up(self.main_win.btn_play)
 
     def btn_cmd_record(self,*args):
 
@@ -171,7 +191,7 @@ class ButtonCommands(ABC, AppBridgeBase):
 
         self.setup_events(self.selected_macro.events)
         self.button_up(self.main_win.btn_record)
-
+        self.btn_bold_on_modify(True)
 
     @abstractmethod
     def load_macro_list(self, refresh=False):
@@ -183,5 +203,5 @@ class ButtonCommands(ABC, AppBridgeBase):
     def setup_events(self,macro_events:list[MacroEvent]):
         print("Fn : setup_events not overrriden")
     @abstractmethod
-    def load_selected_macro(self, macro_name:str):
-        print("Fn : load_selected_macro not overrriden")
+    def select_load_macro(self, macro_name:str):
+        print("Fn : select_load_macro not overrriden")

@@ -20,4 +20,3 @@ class AppBridgeBase(TkinterHelper):
 
     def sbar_msg(self,msg) -> None:
         self.main_win.lb_status_bar['text'] = msg
-
