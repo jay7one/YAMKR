@@ -1,6 +1,7 @@
 import tkinter as tk
+from app_bridge_helpers.tab_ordering import TabOrdering
 
-class TkinterHelper:
+class TkinterHelper(TabOrdering):
     @staticmethod
     def get_window_position(window):
         """Get the position of the main window."""

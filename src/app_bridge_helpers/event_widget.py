@@ -18,7 +18,8 @@ class EventWidget(tk.Label):
         EventType.KEY_DOWN: ("", "\u2193"),  # Keyboard and down arrow
         EventType.CLICK_UP: ("\U0001F5B1", "\u2191"),  # Mouse and up arrow
         EventType.CLICK_DOWN: ("\U0001F5B1", "\u2193"),  # Mouse and down arrow
-        EventType.DELAY: ("\u23F1", "")  # Stopwatch
+        EventType.DELAY: ("\u23F1", ""),  # Stopwatch
+        EventType.SUB_MACRO: ("\u21B3", " ")  #
     }
 
     def __init__(self, parent, event, *args, **kwargs):

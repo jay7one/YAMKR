@@ -39,6 +39,14 @@ class AppSettings(Settings):
         settings["Others"]['Version'] = version
         self.save_dict(settings)
 
+    def check_for_upd_enabled(self)->bool:
+        return self.get_config()["Others"]['Check_update']
+
+    def set_check_for_upd(self, set_on:bool):
+        settings = self.get_config()
+        settings["Others"]['Check_update'] = set_on
+        self.save_dict(settings)
+
     def set_min_on(self, min_setting:str, min_on:bool):
         settings = self.get_config()
         settings["Minimization"][min_setting] = min_on

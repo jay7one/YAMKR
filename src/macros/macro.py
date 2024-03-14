@@ -84,8 +84,8 @@ class Macro(MacroData, MacroEventManager):
     def clear(self):
         self.events = []
 
-    def play(self):
-        self.play_macro(self.events,self)
+    def play(self, sub_player:callable):
+        self.play_macro(self.events,self, sub_player)
 
     def record(self):
         offsets = (self.global_mouse_offset_x, self.global_mouse_offset_y )
@@ -156,7 +156,7 @@ class TestMacroConversion(unittest.TestCase):
         macro_instance = Macro.from_name(macro_name,"")
         macro_instance.global_mouse_movement=True
         macro_instance.print_events(macro_instance.events)
-        macro_instance.play()
+        macro_instance.play(None)
 
         print(f"Macro:{macro_instance}")
         self.assertTrue(macro_instance.events)

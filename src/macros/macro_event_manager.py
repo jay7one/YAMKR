@@ -10,6 +10,7 @@ from macros.macro_event_recorder import MacroEventRecorder
 from macros.macro_data import MacroData
 from helpers.pynput_map import PynputMap
 
+
 class MacroEventManager(MacroEventRecorder):
     def __init__(self):
         super().__init__()
@@ -21,11 +22,12 @@ class MacroEventManager(MacroEventRecorder):
     def sleep_if(self, sleep_on, sleep_ms):
         if sleep_on: time.sleep(sleep_ms/1000)
 
-    def play_macro(self, macro_events:list[MacroEvent], macro:MacroData):
+    def play_macro(self, macro_events:list[MacroEvent], macro:MacroData, sub_player:callable, nested_macro=False):
 
-        self.keyboard_controller = KeyboardController()
-        self.mouse_controller = MouseController()
-        self.stop_playback_event = threading.Event()
+        if not nested_macro:
+            self.keyboard_controller = KeyboardController()
+            self.mouse_controller = MouseController()
+            self.stop_playback_event = threading.Event()
 
         repeat_count = 0
 
@@ -40,6 +42,13 @@ class MacroEventManager(MacroEventRecorder):
                 #print(f"{i=},{event.event_type=},{event.event_value}")
                 if self.stop_playback_event.is_set():
                     break
+
+                if event.event_type == EventType.SUB_MACRO:
+                    if sub_player:
+                        sub_events, sub_macro = sub_player(event.event_value)
+                        self.play_macro(sub_events,sub_macro, sub_player, True)
+                    last_event = event
+                    continue
 
                 if event.event_type == EventType.KEY_DOWN:
                     self.keyboard_controller.press(PynputMap.map_key(event.event_value))
@@ -88,8 +97,10 @@ class MacroEventManager(MacroEventRecorder):
 
                     time.sleep(event.event_value / 1000)  # Convert milliseconds to seconds
 
-
-        self.stop_playback_event.set()  # Stop playback after all repetitions
+        if not nested_macro:
+            self.stop_playback_event.set()  # Stop playback after all repetitions
+            self.stop_playback_event = None
+            self.keyboard_controller = self.mouse_controller = None
 
     def distance(self,x1, y1, x2, y2):
         return ((x2 - x1)**2 + (y2 - y1)**2) ** 0.5
@@ -176,4 +187,4 @@ if __name__ == "__main__":
     )
 
     # Playback recorded macro
-    manager.play_macro( manager.macro_events, macro_data)  # Repeat the macro 3 times, with mouse movement and offsets
+    manager.play_macro( manager.macro_events, macro_data, None)  # Repeat the macro 3 times, with mouse movement and offsets

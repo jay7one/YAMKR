@@ -1,13 +1,14 @@
 import tkinter as tk
+from app_bridge_helpers.tkinter_helper import TkinterHelper
 
-class NewMacroDialog:
+class MacroDialog:
     @classmethod
-    def create_macro(cls, parent_window):
-        cls.result_name = None
-        cls.result_hotkey = None
+    def show(cls, parent_window, title="New Macro", macro_name="", macro_hotkey=""):
+        cls.result_name = macro_name
+        cls.result_hotkey = macro_hotkey
 
         dialog = tk.Toplevel(parent_window)
-        dialog.title("New Macro")
+        dialog.title(title)
 
         # Center the dialog on the screen
         window_width = dialog.winfo_reqwidth()
@@ -33,6 +34,9 @@ class NewMacroDialog:
 
         cancel_button = tk.Button(dialog, text="Cancel", command=dialog.destroy)
         cancel_button.grid(row=2, column=1, padx=5, pady=5)
+
+        TkinterHelper.set_entry_text(macro_name_entry,cls.result_name )
+        TkinterHelper.set_entry_text(hotkey_entry,cls.result_hotkey )
 
         dialog.transient(parent_window)
         dialog.grab_set()
@@ -68,6 +72,6 @@ class NewMacroDialog:
 # Example usage:
 if __name__ == "__main__" :
     root = tk.Tk()
-    macro_name, hotkey = NewMacroDialog.create_macro(root)
-    print("Macro Name:", macro_name)
+    m_name, hotkey = MacroDialog.show(root)
+    print("Macro Name:", m_name)
     print("Hotkey:", hotkey)

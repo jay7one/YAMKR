@@ -1,38 +1,37 @@
 import tkinter as tk
 
-from page.PyMouseMacro import PyMouseMacro,TLDialog
+from page.PyMouseMacro import PyMouseMacro
 from app_data.macro_manager import MacroManager
 from app_data.app_settings import AppSettings
 from macros import Macro
-from macros.macro import MacroEvent
-from app_bridge_helpers.tab_order_manager import TabOrderManager
 from app_bridge_helpers.event_widget import EventWidget
 from app_bridge_helpers.button_commands import ButtonCommands
 from app_bridge_helpers.menu_commands import MenuCommands
+from app_bridge_helpers.tkinter_helper import TkinterHelper
 from helpers.version import Version
 
-# TODO: Version number for releases
-# TODO: Help menu
-# TODO: Menu settings - restore window location
-# TODO: Fonts and sizes in settings
 # TODO: Macro menu - combine macros to new (bluestacks) ( soft link or deep copy ) (adjust for offsets)
 # TODO: Copy paste events - adjusting offsets
-# TODO: requirements file
 
+
+# TODO: Fonts and sizes in settings - low priority - may not do
 
 class AppBridge(ButtonCommands, MenuCommands):
 
-    def __init__(self, main_win:PyMouseMacro, dialog_win:TLDialog) -> None:
+    def __init__(self, main_win:PyMouseMacro) -> None:
         super().__init__()
 
         self.main_win = main_win
-        self.dialog_win = dialog_win
 
         self.app_settings = AppSettings()
         self.macro_manager = MacroManager()
 
-
-        self.app_settings.set_version(Version.get())
+        self.app_settings.set_version(Version.get_from_file())
+        if self.app_settings.check_for_upd_enabled():
+            if not Version.check_version():
+                self.sbar_msg(f"New Version Available: {Version.github_version}")
+            else:
+                self.sbar_msg(f"Version:{Version.file_version}")
 
         self.add_callbacks(main_win)
         self.load_macro_list()
@@ -40,8 +39,9 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.selected_macro:Macro = None
 
         self.additional_settings()
+        self.setup_button_icons()
 
-        TabOrderManager.set_tab_order(self.main_win.top)
+        TkinterHelper.set_tab_order(self.main_win.top)
 
         self.main_win.frame_macro_evt_buttons.lift()
         self.main_win.lframe_macro_settings.lift()
@@ -69,6 +69,25 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.main_win.slbox_macro_list.configure(selectforeground="darkblue")
         self.main_win.slbox_macro_list.configure(selectbackground="lightcyan")
 
+    def setup_button_icons(self):
+
+        #font="-family {DejaVu Sans} -size 10"
+        bt_font = r"-family {Lucid Console} -size 14"
+        btns = {
+            'folder'  : (self.main_win.btn_folder,  '\U0001F4C1', '... Open file explorer where macro resides '    ),
+            'refresh' : (self.main_win.btn_refresh, '\u27F3'    , '... Refresh macro list '  ),
+            'rename'  : (self.main_win.btn_rename,  '\U0000270E', '... Rename selected macro'  ),
+        }
+        bt:tk.Button
+        for _,v in btns.items():
+            bt, txt, hover_t = v
+            bt.config(text=txt)
+            bt.config(font=bt_font)
+            bt.bind("<Enter>", lambda btn=bt, ht=hover_t    : self.set_button_sbar(None,ht) )
+            bt.bind("<Leave>", lambda btn=bt, ht=''         : self.set_button_sbar(None,ht) )
+
+    def set_button_sbar(self, _, txt):self.sbar_msg(txt)
+
     def load_macro_list(self, refresh=False):
         self.main_win.slbox_macro_list.delete(0,tk.END)
         cur_selection = None
@@ -84,7 +103,8 @@ class AppBridge(ButtonCommands, MenuCommands):
         else:
             self.selected_macro = None
 
-
+    def get_macro_names(self, refresh=False):
+        return self.macro_manager.get_macro_names(refresh)
 
     def config_event(self,event):   # pylint: disable=unused-argument
         self.app_settings.set_main_geo(self.get_window_geo(self.root))
@@ -117,6 +137,7 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.main_win.btn_hotkey_del.       config(command=lambda b=self.main_win.btn_hotkey_del        :self.btn_cmd_hotkey_del(b))
         self.main_win.btn_add_macro.        config(command=lambda b=self.main_win.btn_add_macro         :self.btn_cmd_macro_add(b))
         self.main_win.btn_del_macro.        config(command=lambda b=self.main_win.btn_del_macro         :self.btn_cmd_macro_del(b))
+        self.main_win.btn_rename.           config(command=lambda b=self.main_win.btn_rename            :self.btn_cmd_rename(b))
 
         self.main_win.btn_play.config(command=self.btn_cmd_play)
 
@@ -143,8 +164,8 @@ class AppBridge(ButtonCommands, MenuCommands):
             ]
 
         for ew in entry_widgets:
-            vcmd = ew.register(self.validate_number)
-            ew.config(validate="key", validatecommand=(vcmd, '%P'))
+            val_num_cmd = ew.register(self.validate_number)
+            ew.config(validate="key", validatecommand=(val_num_cmd, '%P'))
 
         vcmd = self.main_win.entry_repeat.register(self.validate_repeat_callback)
         self.main_win.entry_repeat.config(validate='focusout', validatecommand=(vcmd, '%P'))
@@ -163,6 +184,10 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.update_macro_screen()
         self.sbar_msg(f"Loaded macro: {self.selected_macro.name}")
 
+    def sub_player(self,macro_name):
+        sub_macro = self.macro_manager.load_macro(macro_name)
+        self.sbar_msg(f"Loaded macro: {macro_name}")
+        return sub_macro.events, sub_macro
 
     def update_macro_screen(self):
 
@@ -191,7 +216,7 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.btn_cmd_repeatState()
 
         self.set_mouse_offset(macro)
-        self.setup_events(macro.events)
+        self.setup_events()
 
     def mouse_offset(self):
         txtstr = self.main_win.label_offset['text']
@@ -212,7 +237,7 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.macro_manager.save_macro(macro)
         self.sbar_msg(f"Saved macro: {self.selected_macro.name}")
 
-    def setup_events(self,macro_events:list[MacroEvent]):   # pylint: disable=unused-argument
+    def setup_events(self):
 
         self.clear_evt_labels()
         canvas = self.main_win.swin_events
@@ -264,7 +289,7 @@ class AppBridge(ButtonCommands, MenuCommands):
 
 
     @classmethod
-    def main(cls, version):
+    def main(cls):
         '''Main entry point for the application.'''
 
         cls.root = tk.Tk()
@@ -275,13 +300,9 @@ class AppBridge(ButtonCommands, MenuCommands):
         cls.pymacros_toplevel = cls.root #tk.Toplevel(cls.root)   #
         cls.pymacros_win = PyMouseMacro(cls.pymacros_toplevel)
 
-        cls.dialog_toplevel = tk.Toplevel(cls.root)
-        cls.dialog_win = TLDialog(cls.dialog_toplevel)
-        cls.dialog_toplevel.withdraw()
-
         cls.pymacros_toplevel.update()
 
-        cls.app_bridge = AppBridge(cls.pymacros_win,cls.dialog_win, version)
+        cls.app_bridge = AppBridge(cls.pymacros_win)
         cls.root.mainloop()
 
 if __name__ == '__main__':

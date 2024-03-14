@@ -6,6 +6,7 @@ class EventType(Enum):
     CLICK_UP = "click_up"
     CLICK_DOWN = "click_down"
     DELAY = "delay"
+    SUB_MACRO = "sub_macro"
 
     def __str__(self):
         return self.value
@@ -28,7 +29,7 @@ class MacroEvent:
         return f'{str(self.event_type)}:{self.event_value}'
 
     def data(self):
-        if self.event_type in [EventType.KEY_UP, EventType.KEY_DOWN, EventType.DELAY]:
+        if self.event_type in [EventType.KEY_UP, EventType.KEY_DOWN, EventType.DELAY, EventType.SUB_MACRO]:
             return str(self.event_type) , self.event_value
 
         if self.event_type in [EventType.CLICK_UP, EventType.CLICK_DOWN]:

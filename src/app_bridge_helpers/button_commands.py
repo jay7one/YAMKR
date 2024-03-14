@@ -4,10 +4,11 @@ import tkinter as tk
 from app_bridge_helpers.app_bridge_base import AppBridgeBase
 
 from macros.macro import MacroEvent, MACRO_EXT
+from macros.macro_data import MacroData
 from helpers.mouse_click import MouseClick
 from helpers.hot_key import HotKey
 from helpers.file_explorer import FileExplorer
-from windows.new_macro_dialog import NewMacroDialog
+from windows.macro_dialog import MacroDialog
 from windows.popup_dialog import PopupDialog
 
 class ButtonCommands(ABC, AppBridgeBase):
@@ -118,7 +119,7 @@ class ButtonCommands(ABC, AppBridgeBase):
         self.main_win.lb_hotkey_text['text'] = self.selected_macro.hotkey
 
     def btn_cmd_macro_add(self,*args):
-        name, hotkey = NewMacroDialog.create_macro(self.root)
+        name, hotkey = MacroDialog.show(self.root)
         if not name : return
         new_name = name
         #print(f"BtnAdd:{new_name=}")
@@ -169,15 +170,18 @@ class ButtonCommands(ABC, AppBridgeBase):
         if self.app_settings.get_min_on_play() :
             self.root.withdraw()
 
-        self.selected_macro.play()
+        self.selected_macro.play(self.sub_player)
 
         if self.app_settings.get_min_on_play() :
             self.root.deiconify()
 
         self.button_up(self.main_win.btn_play)
 
-    def btn_cmd_record(self,*args):
+    @abstractmethod
+    def sub_player(self,macro_name:str) -> tuple[MacroEvent, MacroData]:
+        pass
 
+    def btn_cmd_record(self,*args):
         if not self.selected_macro: return
         self.button_down(self.main_win.btn_record)
 
@@ -189,19 +193,15 @@ class ButtonCommands(ABC, AppBridgeBase):
         if self.app_settings.get_min_on_record() :
             self.root.deiconify()
 
-        self.setup_events(self.selected_macro.events)
+        self.setup_events()
         self.button_up(self.main_win.btn_record)
         self.btn_bold_on_modify(True)
 
-    @abstractmethod
-    def load_macro_list(self, refresh=False):
-        print("Fn : load_macro_list not overrriden")
-    @abstractmethod
-    def macro_select(self,macro_name:str):
-        print("Fn : macro_select not overrriden")
-    @abstractmethod
-    def setup_events(self,macro_events:list[MacroEvent]):
-        print("Fn : setup_events not overrriden")
-    @abstractmethod
-    def select_load_macro(self, macro_name:str):
-        print("Fn : select_load_macro not overrriden")
+    def btn_cmd_rename(self,*args):
+        if not self.selected_macro: return
+        new_name, hotkey = MacroDialog.show(self.root, "Rename Macro", self.selected_macro.name,self.selected_macro.hotkey)
+        if not new_name : return
+        self.macro_manager.rename_macro(self.selected_macro,new_name)
+        self.macro_manager.new_macro(new_name,hotkey)
+        self.load_macro_list()
+        self.macro_select(new_name)

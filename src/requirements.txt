@@ -1,0 +1,4 @@
+attrdict3==2.0.2
+pynput==1.7.6
+requests==2.31.0
+urllib3==2.2.1
