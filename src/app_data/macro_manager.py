@@ -109,6 +109,7 @@ class MacroManager(Settings):
 
     def load_macro(self, name) -> Macro:
         macro = Macro.from_file(self.get_macro_fullpath(name))
+        macro.name = name   # Just in case file was copied
         #print(f"Loaded Macro {name} events:{len(macro.events)}")
         return macro
 

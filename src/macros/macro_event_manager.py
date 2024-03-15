@@ -22,12 +22,13 @@ class MacroEventManager(MacroEventRecorder):
     def sleep_if(self, sleep_on, sleep_ms):
         if sleep_on: time.sleep(sleep_ms/1000)
 
-    def play_macro(self, macro_events:list[MacroEvent], macro:MacroData, sub_player:callable, nested_macro=False):
+    def play_macro(self, macro_events:list[MacroEvent], macro:MacroData, sub_player:callable, parent_macro=None):
 
-        if not nested_macro:
+        if parent_macro is None:
             self.keyboard_controller = KeyboardController()
             self.mouse_controller = MouseController()
             self.stop_playback_event = threading.Event()
+            self.start_playback_listening()
 
         repeat_count = 0
 
@@ -46,7 +47,8 @@ class MacroEventManager(MacroEventRecorder):
                 if event.event_type == EventType.SUB_MACRO:
                     if sub_player:
                         sub_events, sub_macro = sub_player(event.event_value)
-                        self.play_macro(sub_events,sub_macro, sub_player, True)
+                        top_parent = macro if parent_macro is None else parent_macro
+                        self.play_macro(sub_events,sub_macro, sub_player, parent_macro=top_parent)
                     last_event = event
                     continue
 
@@ -64,7 +66,8 @@ class MacroEventManager(MacroEventRecorder):
 
                 if event.event_type == EventType.CLICK_DOWN:
                     button, x, y = event.mouse_event_data()
-                    self.mouse_controller.position = (x + macro.global_mouse_offset_x, y + macro.global_mouse_offset_y)
+                    offset_macro = macro if parent_macro is None else parent_macro
+                    self.mouse_controller.position = (x + offset_macro.global_mouse_offset_x, y + offset_macro.global_mouse_offset_y)
                     self.mouse_controller.press(PynputMap.map_btn(button))
                     self.sleep_if(macro.global_mousepress_interval_on,macro.global_mousepress_interval)
                     last_event = event
@@ -72,7 +75,8 @@ class MacroEventManager(MacroEventRecorder):
 
                 if event.event_type == EventType.CLICK_UP:
                     button, x, y = event.mouse_event_data()
-                    self.mouse_controller.position = (x + macro.global_mouse_offset_x, y + macro.global_mouse_offset_y)
+                    offset_macro = macro if parent_macro is None else parent_macro
+                    self.mouse_controller.position = (x + offset_macro.global_mouse_offset_x, y + offset_macro.global_mouse_offset_y)
                     self.mouse_controller.release(PynputMap.map_btn(button))
                     self.sleep_if(macro.global_release_interval_on,macro.global_release_interval)
                     last_event = event
@@ -97,7 +101,7 @@ class MacroEventManager(MacroEventRecorder):
 
                     time.sleep(event.event_value / 1000)  # Convert milliseconds to seconds
 
-        if not nested_macro:
+        if parent_macro is None:
             self.stop_playback_event.set()  # Stop playback after all repetitions
             self.stop_playback_event = None
             self.keyboard_controller = self.mouse_controller = None
@@ -148,8 +152,13 @@ class MacroEventManager(MacroEventRecorder):
         self.playback_kb_listener.start()
 
     def on_playback_key_press(self, key):
+        if self.stop_playback_event is None: return
+
         if key == Key.ctrl_l and not self.stop_playback_event.is_set():
             self.stop_playback()
+
+    def on_release(self, key_released):
+        return key_released not in [Key.ctrl_l , Key.esc]
 
 # Example usage:
 if __name__ == "__main__":

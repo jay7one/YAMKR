@@ -26,6 +26,9 @@ class PopupDialog:
         if enable_cancel:
             cancel_button = tk.Button(button_frame, text="Cancel", command=dialog.destroy)
             cancel_button.pack(side=tk.RIGHT, padx=5)
+            dialog.bind('<Escape>', lambda evt: dialog.destroy() )
+
+        dialog.bind('<Return>', lambda evt: cls._return(dialog))
 
         # Center the dialog
         dialog.update_idletasks()
@@ -33,6 +36,9 @@ class PopupDialog:
 
         dialog.transient(parent_window)
         dialog.grab_set()
+        dialog.focus_force()
+
+        ok_button.focus_set()
 
         # Make the dialog modal
         dialog.wait_window(dialog)

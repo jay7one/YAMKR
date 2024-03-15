@@ -10,11 +10,23 @@ from app_bridge_helpers.menu_commands import MenuCommands
 from app_bridge_helpers.tkinter_helper import TkinterHelper
 from helpers.version import Version
 
-# TODO: Macro menu - combine macros to new (bluestacks) ( soft link or deep copy ) (adjust for offsets)
-# TODO: Copy paste events - adjusting offsets
+# TODO: Full list below:
+# test hot key listener for F1-12 playback
 
 
-# TODO: Fonts and sizes in settings - low priority - may not do
+# TODO: Low priority items
+# Fonts and sizes in settings - low priority - may not do
+# Work out way to suppress errors when mouse scrolling, window enter events are setting callback
+# control-c/v for copy/paste
+# Maybe have option in sub_macro to say abs/rel offsets used
+# Convert Page to normal file ? - when ready , will needs to change call backs
+
+# DONE
+# Copy paste events - adjusting offsets
+# Centre dialog boxes in macro window not screen centre
+# Allow functions keys to be preseed when adding macro
+# pressing enter on entry field should be click ok event
+# Paste should be like record, have buttons in red.
 
 class AppBridge(ButtonCommands, MenuCommands):
 
@@ -48,8 +60,12 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.main_win.slbox_macro_list.lift()
         self.main_win.frame_macro_list_buttons.lift()
 
-        saved_geo = self.app_settings.get_main_geo()
-        self.set_window_geo(self.root,saved_geo)
+        self.main_geo = self.app_settings.get_main_geo()
+        self.set_window_geo(self.root,self.main_geo)
+        TkinterHelper.set_main_geo(self.main_win.top, self.main_geo)
+
+        self.menu_setting_vars['min_on_play'] = tk.BooleanVar()
+        self.menu_setting_vars['min_on_record'] = tk.BooleanVar()
 
 
         self.root.resizable(0,0)
@@ -61,9 +77,6 @@ class AppBridge(ButtonCommands, MenuCommands):
             self.main_win.slbox_macro_list.index(0)
             self.main_win.slbox_macro_list.select_set(0) #This only sets focus on the first item.
             self.main_win.slbox_macro_list.event_generate("<<ListboxSelect>>")
-
-        self.menu_setting_vars['min_on_play'] = tk.BooleanVar()
-        self.menu_setting_vars['min_on_record'] = tk.BooleanVar()
 
     def additional_settings(self):
         self.main_win.slbox_macro_list.configure(selectforeground="darkblue")
@@ -107,7 +120,10 @@ class AppBridge(ButtonCommands, MenuCommands):
         return self.macro_manager.get_macro_names(refresh)
 
     def config_event(self,event):   # pylint: disable=unused-argument
-        self.app_settings.set_main_geo(self.get_window_geo(self.root))
+        if event.widget is self.root:
+            self.app_settings.set_main_geo(self.get_window_geo(self.root))
+            self.main_geo = self.app_settings.get_main_geo()
+            TkinterHelper.set_main_geo(self.main_win.top, self.main_geo)
 
     def check_for_hotkey(self, event:tk.Event):
         hotkey = event.keysym
@@ -176,13 +192,24 @@ class AppBridge(ButtonCommands, MenuCommands):
         if not selection: return
         index = selection[0]
         macro_name =  event.widget.get(index)
-        self.main_win.swin_events.delete("all")
         self.select_load_macro(macro_name)
 
     def select_load_macro(self, macro_name):
         self.selected_macro = self.macro_manager.load_macro(macro_name)
         self.update_macro_screen()
         self.sbar_msg(f"Loaded macro: {self.selected_macro.name}")
+
+    def get_prev_macro(self, macro_name:str):
+        listbox = self.main_win.slbox_macro_list
+        items = listbox.get(0, tk.END)
+        index = items.index(macro_name)
+
+        if len(items) == 1:
+            return None, None
+        if index == 0:
+            return listbox.get(index+1), 0
+
+        return listbox.get(index-1), index - 1
 
     def sub_player(self,macro_name):
         sub_macro = self.macro_manager.load_macro(macro_name)
@@ -240,10 +267,17 @@ class AppBridge(ButtonCommands, MenuCommands):
     def setup_events(self):
 
         self.clear_evt_labels()
-        canvas = self.main_win.swin_events
-
         if not self.selected_macro.events :
             return
+
+        inner_frame = self.main_win.swin_events_f
+
+        #button = {}
+        #for i in range(12):
+        #    button[i] = tk.Button(inner_frame, text='VButton'+str(i))
+        #    button[i].grid(sticky='w')
+        #self.events_drawn()
+
 
         #max_label_length = 15 # max(len(evt.abv) for evt in self.selected_macro.events)
         #max_label_width = max_label_length * 8  # Adjust this multiplier based on font size and character width
@@ -251,7 +285,7 @@ class AppBridge(ButtonCommands, MenuCommands):
         #num_columns = max(1, canvas_width // max_label_width)
         num_columns= 4
         # num_rows = math.ceil(len(label_list) / num_columns)
-
+        label:tk.Label = None
         for i, evt in enumerate(self.selected_macro.events):
             row = i // num_columns
             col = i % num_columns
@@ -260,9 +294,21 @@ class AppBridge(ButtonCommands, MenuCommands):
             #lfont = "Apple Color Emoji"
             #lfont = "Noto Color Emoji"
             lfont = "Lucid Console"
-            label = EventWidget(canvas, evt, justify='left',font=(lfont, 12) )
+            #label = EventWidget(self.main_win.swin_events, evt, justify='left',font=(lfont, 12) )
+            label = EventWidget(inner_frame, evt, justify='left',font=(lfont, 10) )
 
             label.grid(row=row, column=col, sticky="w", padx=5, pady=5)
+            #
+            # label.grid(sticky="w")
+
+        label.wait_visibility()
+        self.events_drawn()
+
+    def events_drawn(self):
+        inner_frame:tk.Canvas = self.main_win.swin_events_f
+        bbox = inner_frame.bbox()
+        self.main_win.swin_events.config(scrollregion=bbox)
+
 
     def macro_select(self,macro_name:str):
         listbox = self.main_win.slbox_macro_list
@@ -274,7 +320,7 @@ class AppBridge(ButtonCommands, MenuCommands):
             listbox.see(index)  # Ensure the selected item is visible
             self.select_load_macro(macro_name)
         except ValueError:
-            pass
+            print(f"Value Error in selecting macro: {macro_name}")
 
     def get_text(self,entry_field):
         #return entry_field.get("1.0",'end-1c')

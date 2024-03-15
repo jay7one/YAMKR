@@ -22,9 +22,14 @@ class ButtonCommands(ABC, AppBridgeBase):
         entry.config(state=new_state)
 
     def clear_evt_labels(self):
+        self.clear_frame(self.main_win.swin_events_f)
+
         #self.main_win.swin_events.delete("all")
-        for l in self.main_win.swin_events.children.values():
-            l.grid_forget()
+        #for l in self.main_win.swin_events_f.children.values():
+        #    l.grid_forget()
+
+
+
 
     def btn_cmd_clear(self):
         if not self.selected_macro:
@@ -138,10 +143,15 @@ class ButtonCommands(ABC, AppBridgeBase):
         confirmed = PopupDialog.popup(self.pymacros_toplevel,"Delete Macro",
                                    f"Confirm deletion of {self.selected_macro.name}.",enable_cancel=True)
         if confirmed:
+            prev_macro_name,idx = self.get_prev_macro(self.selected_macro.name)
             self.macro_manager.remove_macro(self.selected_macro.name)
-            self.clear_evt_labels()
-
-        self.load_macro_list()
+            self.load_macro_list()
+            if prev_macro_name:
+                self.select_load_macro(prev_macro_name)
+                #self.main_win.slbox_macro_list.index(idx)
+                self.main_win.slbox_macro_list.see(idx)
+                self.main_win.slbox_macro_list.select_set(idx) #This only sets focus on the first item.
+                self.main_win.slbox_macro_list.event_generate("<<ListboxSelect>>")
 
     def btn_cmd_folder(self,*args):
         name = None

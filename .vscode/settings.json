@@ -30,5 +30,6 @@
             "name": "fastapi",
             "depth": 2
         }
-    ]
+    ],
+    "python.REPL.enableREPLSmartSend": false
 }

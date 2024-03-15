@@ -1,6 +1,7 @@
 import tkinter as tk
 from page.PyMouseMacro import MacroMerge
 from macros.macro_event import MacroEvent, EventType
+from app_bridge_helpers.tkinter_helper import TkinterHelper
 
 class MacroMerger():
 
@@ -8,7 +9,8 @@ class MacroMerger():
 
         self.macro_merge_tl = tk.Toplevel(root)
         self.macro_merge = MacroMerge(self.macro_merge_tl)
-        self.macro_merge_tl.resizable(0,0)
+
+        self.macro_merge_tl.withdraw()
 
         self.macro_merge.btn_mm_clear.configure(command=self.btn_mm_cmd_clear)
         self.macro_merge.btn_mm_remove.configure(command=self.btn_mm_cmd_remove)
@@ -26,6 +28,15 @@ class MacroMerger():
         self.right_selection = None
         self.left_selection = None
         self.results = None
+
+        self.macro_merge_tl.update()
+        #x,y,w,h = TkinterHelper.get_geo(self.macro_merge_tl.geometry())
+
+        TkinterHelper.centre_dialog(self.macro_merge_tl)
+
+        self.macro_merge_tl.deiconify()
+
+        self.macro_merge_tl.resizable(0,0)
 
     def show(self, macro_list:list[str], selected_macro:str):
         self.results = None

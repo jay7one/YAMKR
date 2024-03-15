@@ -16,6 +16,7 @@ class AppBridgeBase(TkinterHelper):
         self.macro_manager:MacroManager = None
         self.selected_macro:Macro = None
         self.menu_setting_vars = {}
+        self.main_geo = None
 
     def sbar_msg(self,msg) -> None:
         self.main_win.lb_status_bar['text'] = msg
@@ -25,16 +26,33 @@ class AppBridgeBase(TkinterHelper):
 
     @abstractmethod
     def load_macro_list(self, refresh=False):
-        print("Fn : load_macro_list not overrriden")
+        pass
 
     @abstractmethod
     def macro_select(self,macro_name:str):
-        print("Fn : macro_select not overrriden")
+        pass
 
     @abstractmethod
     def setup_events(self):
-        print("Fn : setup_events not overrriden")
+        pass
 
     @abstractmethod
     def select_load_macro(self, macro_name:str):
-        print("Fn : select_load_macro not overrriden")
+        pass
+
+    @abstractmethod
+    def get_prev_macro(self, macro_name:str):
+        pass
+
+    @abstractmethod
+    def center_win(self, win):
+        pass
+
+    @abstractmethod
+    def btn_bold_on_modify(self, modified):
+        pass
+
+if __name__ == '__main__':
+    gs = "300x200+100+50"
+    x, y, width, height = AppBridgeBase.get_geo(gs)
+    print(f"x: {x}, y: {y}, width: {width}, height: {height}")

@@ -2,6 +2,8 @@ import os
 import json
 import unittest
 import time
+import copy
+
 from macros.macro_event import MacroEvent, EventType
 from macros.macro_event_manager import MacroEventManager
 from macros.macro_data import MacroData
@@ -58,6 +60,17 @@ class Macro(MacroData, MacroEventManager):
 
     def add_event(self, event_type, event_value):
         self.events.append( MacroEvent(event_type,event_value))
+
+    def add_event_list(self, new_events:list[MacroEvent], org_offsets):
+        ox,oy = org_offsets
+        for e in new_events:
+            new_evt = copy.deepcopy(e)
+            if new_evt.event_type in [EventType.CLICK_DOWN, EventType.CLICK_UP]:
+                button, x, y = new_evt.event_value
+                x += ox - self.global_mouse_offset_x
+                y += oy - self.global_mouse_offset_y
+                new_evt.event_value = ( button, x, y )
+            self.events.append(new_evt)
 
     def to_dict(self):
         obj_dict = {
