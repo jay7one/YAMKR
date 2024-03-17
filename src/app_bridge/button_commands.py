@@ -1,15 +1,16 @@
 from abc import ABC, abstractmethod
 import tkinter as tk
 
-from app_bridge_helpers.app_bridge_base import AppBridgeBase
+from app_bridge.app_bridge_base import AppBridgeBase
 
 from macros.macro import MacroEvent, MACRO_EXT
 from macros.macro_data import MacroData
 from helpers.mouse_click import MouseClick
-from helpers.hot_key import HotKey
 from helpers.file_explorer import FileExplorer
+from helpers.hot_key_helper import HotKeyHelper
 from windows.macro_dialog import MacroDialog
 from windows.popup_dialog import PopupDialog
+from windows.tkinter_helper import TkinterHelper as tkh
 
 class ButtonCommands(ABC, AppBridgeBase):
 
@@ -22,7 +23,7 @@ class ButtonCommands(ABC, AppBridgeBase):
         entry.config(state=new_state)
 
     def clear_evt_labels(self):
-        self.clear_frame(self.main_win.swin_events_f)
+        tkh.clear_frame(self.main_win.swin_events_f)
 
         #self.main_win.swin_events.delete("all")
         #for l in self.main_win.swin_events_f.children.values():
@@ -44,7 +45,7 @@ class ButtonCommands(ABC, AppBridgeBase):
         self.btn_cmd_key_intv_state(button)
 
     def btn_cmd_key_intv_state(self,button:tk.Button):
-        self.button_toggle(button,self.selected_macro.global_keypress_interval_on)
+        tkh.button_toggle(button,self.selected_macro.global_keypress_interval_on)
         self.entry_toggle(self.main_win.entry_k_press_intv, self.selected_macro.global_keypress_interval_on)
 
     def btn_cmd_mouse_intv(self,button:tk.Button):
@@ -53,7 +54,7 @@ class ButtonCommands(ABC, AppBridgeBase):
         self.btn_cmd_mouse_intv_state(button)
 
     def btn_cmd_mouse_intv_state(self,button:tk.Button):
-        self.button_toggle(button,self.selected_macro.global_mousepress_interval_on)
+        tkh.button_toggle(button,self.selected_macro.global_mousepress_interval_on)
         self.entry_toggle(self.main_win.entry_m_press_intv, self.selected_macro.global_mousepress_interval_on)
 
     def btn_cmd_rel_delay(self,button:tk.Button):
@@ -62,7 +63,7 @@ class ButtonCommands(ABC, AppBridgeBase):
         self.btn_cmd_rel_delayState(button)
 
     def btn_cmd_rel_delayState(self,button:tk.Button):
-        self.button_toggle(button,self.selected_macro.global_release_interval_on)
+        tkh.button_toggle(button,self.selected_macro.global_release_interval_on)
         self.entry_toggle(self.main_win.entry_rel_delay, self.selected_macro.global_release_interval_on)
 
     def btn_bold_on_modify(self, modified):
@@ -84,19 +85,19 @@ class ButtonCommands(ABC, AppBridgeBase):
         if self.selected_macro is None: return
         if self.selected_macro.global_repeat < 1 :
             self.selected_macro.global_repeat = 1
-        self.set_entry_text(self.main_win.entry_repeat,self.selected_macro.global_repeat)
+        tkh.set_entry_text(self.main_win.entry_repeat,self.selected_macro.global_repeat)
 
     def btn_cmd_mouse_offset(self,button:tk.Button):
         if self.selected_macro is None: return
-        self.button_down(button)
+        tkh.button_down(button)
         self.selected_macro.global_mouse_offset_x,self.selected_macro.global_mouse_offset_y = MouseClick.get_next_click()
-        self.button_up(button)
+        tkh.button_up(button)
         self.set_mouse_offset(self.selected_macro)
 
     def btn_cmd_move_mouse(self,button:tk.Button):
         if self.selected_macro is None: return
         self.selected_macro.global_mouse_movement = not self.selected_macro.global_mouse_movement
-        self.button_toggle(button,self.selected_macro.global_mouse_movement)
+        tkh.button_toggle(button,self.selected_macro.global_mouse_movement)
 
     def btn_cmd_hotkey_del(self,*args):
         if self.selected_macro is None: return
@@ -106,7 +107,7 @@ class ButtonCommands(ABC, AppBridgeBase):
     def btn_cmd_hotkey_add(self,button:tk.Button):
         if self.selected_macro is None: return
 
-        HotKey.add_hotkey(
+        HotKeyHelper.add_hotkey(
             self.root,
             self.main_win.lb_hotkey_text,
             self.main_win.btn_hotkey_add,
@@ -175,7 +176,7 @@ class ButtonCommands(ABC, AppBridgeBase):
 
     def btn_cmd_play(self,*args):
         if not self.selected_macro: return
-        self.button_down(self.main_win.btn_play)
+        tkh.button_down(self.main_win.btn_play)
 
         if self.app_settings.get_min_on_play() :
             self.root.withdraw()
@@ -185,7 +186,7 @@ class ButtonCommands(ABC, AppBridgeBase):
         if self.app_settings.get_min_on_play() :
             self.root.deiconify()
 
-        self.button_up(self.main_win.btn_play)
+        tkh.button_up(self.main_win.btn_play)
 
     @abstractmethod
     def sub_player(self,macro_name:str) -> tuple[MacroEvent, MacroData]:
@@ -193,7 +194,7 @@ class ButtonCommands(ABC, AppBridgeBase):
 
     def btn_cmd_record(self,*args):
         if not self.selected_macro: return
-        self.button_down(self.main_win.btn_record)
+        tkh.button_down(self.main_win.btn_record)
 
         if self.app_settings.get_min_on_record() :
             self.root.withdraw()
@@ -204,7 +205,7 @@ class ButtonCommands(ABC, AppBridgeBase):
             self.root.deiconify()
 
         self.setup_events()
-        self.button_up(self.main_win.btn_record)
+        tkh.button_up(self.main_win.btn_record)
         self.btn_bold_on_modify(True)
 
     def btn_cmd_rename(self,*args):
@@ -212,6 +213,5 @@ class ButtonCommands(ABC, AppBridgeBase):
         new_name, hotkey = MacroDialog.show(self.root, "Rename Macro", self.selected_macro.name,self.selected_macro.hotkey)
         if not new_name : return
         self.macro_manager.rename_macro(self.selected_macro,new_name)
-        self.macro_manager.new_macro(new_name,hotkey)
         self.load_macro_list()
         self.macro_select(new_name)

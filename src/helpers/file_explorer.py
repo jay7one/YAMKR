@@ -1,10 +1,10 @@
 import os
 import subprocess
+from abc import ABC
 
-class FileExplorer:
-    @classmethod
-    def open(cls, path, filename=None):
-
+class FileExplorer(ABC):    # pylint: disable=too-few-public-methods
+    @staticmethod
+    def open( path, filename=None):
         if not os.path.exists(path) :
             raise FileNotFoundError(f"The path '{path}' does not exist.")
 

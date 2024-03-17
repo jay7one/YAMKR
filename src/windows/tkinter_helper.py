@@ -1,10 +1,10 @@
 import tkinter as tk
-from app_bridge_helpers.tab_ordering import TabOrdering
+from app_bridge.tab_ordering import TabOrdering
 
 class TkinterHelper(TabOrdering):
     main_win_geo:tuple[int,int,int,int] = (0,0,0,0)
     @classmethod
-    def set_main_geo(cls, win_tl:tk.Toplevel, geo_str:str):
+    def set_main_geo(cls, win_tl:tk.Toplevel):
         win_tl_geo = win_tl.geometry()
         cls.main_win_geo = cls.get_geo(win_tl_geo)
 
@@ -38,6 +38,7 @@ class TkinterHelper(TabOrdering):
 
         #print(f"Geo: {tl_w}x{tl_h}+{x}+{y}")
         dialog.geometry(f'{tl_w}x{tl_h}+{x}+{y}')
+        dialog.resizable( 0,0 )
 
     @staticmethod
     def get_window_position(window):

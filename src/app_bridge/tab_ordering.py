@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 
 class TabOrdering():
-    class WidgetInfo:
+    class WidgetInfo:      # pylint: disable=too-few-public-methods
         def __init__(self, widget, abs_x, abs_y):
             self.widget = widget
             self.abs_x = abs_x

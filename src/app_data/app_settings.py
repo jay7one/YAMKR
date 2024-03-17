@@ -66,7 +66,7 @@ class AppSettings(Settings):
         settings = self.get_config()
         return settings["main_screen"]["geo"]
 
-    def set_main_geo(self, geo:str):
+    def set_geo_settings(self, geo:str):
         settings = self.get_config()
         settings["main_screen"]["geo"] = geo
         self.save_dict(settings)

@@ -1,6 +1,6 @@
 import tkinter as tk
 
-class HotKey:
+class HotKeyHelper:
 
     @classmethod
     def add_hotkey(cls, win_root, hotkey_label:tk.Label, add_hotkey_button:tk.Button, hotkey_callback):

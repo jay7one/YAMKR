@@ -2,24 +2,14 @@ import tkinter as tk
 from macros.macro_event import MacroEvent, EventType
 
 class EventWidget(tk.Label):
-    ICON_SIZE = 32
 
-    ICONS1 = {
-        EventType.KEY_UP: ("⌨️", "\u2191"),  # Keyboard and up arrow
-        EventType.KEY_DOWN: ("⌨️", "⬇️"),  # Keyboard and down arrow
-        EventType.CLICK_UP: ("🖱️", "⬆️"),  # Mouse and up arrow
-        EventType.CLICK_DOWN: ("🖱️", "⬇️"),  # Mouse and down arrow
-        EventType.DELAY: ("\u23F1", "")  # Stopwatch
-    }
-
-    kb_icon = "\U0001F5A9"
     ICONS = {
-        EventType.KEY_UP: ("", "\u2191"),  # Keyboard and up arrow
-        EventType.KEY_DOWN: ("", "\u2193"),  # Keyboard and down arrow
-        EventType.CLICK_UP: ("\U0001F5B1", "\u2191"),  # Mouse and up arrow
-        EventType.CLICK_DOWN: ("\U0001F5B1", "\u2193"),  # Mouse and down arrow
-        EventType.DELAY: ("\u23F1", ""),  # Stopwatch
-        EventType.SUB_MACRO: ("\u21B3", " ")  #
+        EventType.KEY_UP:       ("", "\u2191"),
+        EventType.KEY_DOWN:     ("", "\u2193"),
+        EventType.CLICK_UP:     ("\U0001F5B1", "\u2191"),
+        EventType.CLICK_DOWN:   ("\U0001F5B1", "\u2193"),
+        EventType.DELAY:        ("\u23F1", ""),  # Stopwatch
+        EventType.SUB_MACRO:    ("\u21B3", " ")
     }
 
     def __init__(self, parent, event, *args, **kwargs):
@@ -36,7 +26,6 @@ class EventWidget(tk.Label):
             if icon2 == "":
                 text += "ms"
             text = text.ljust(12)
-            #print(f"Debug:{text=}")
             self.config(text=text,anchor=tk.W, relief='raised')
 
 # Example usage:

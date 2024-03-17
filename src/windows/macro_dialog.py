@@ -1,9 +1,10 @@
 import tkinter as tk
-from app_bridge_helpers.tkinter_helper import TkinterHelper
+from windows.tkinter_helper import TkinterHelper as tkh
 
 class MacroDialog:
     btn_ok = None
     entry_name = None
+    entry_hotkey = None
 
     class FnKeyEntry(tk.Entry):
         def __init__(self, master, *args, **kwargs):
@@ -12,11 +13,11 @@ class MacroDialog:
 
         def on_key_press(self, event):
             if len(event.keysym) > 1 and event.keysym[0] == 'F':
-                print(f"Debug {event.keysym=}, {event.char=}")
                 self.delete(0,tk.END)
                 self.insert(0,event.keysym)
                 self.update()
                 return "break"
+            return None
 
 
     @classmethod
@@ -27,51 +28,39 @@ class MacroDialog:
         dialog = tk.Toplevel(parent_window)
         dialog.title(title)
 
-        dialog.withdraw()
-
-        # Center the dialog on the screen
-        window_width = dialog.winfo_reqwidth()
-        window_height = dialog.winfo_reqheight()
-        position_right = int(dialog.winfo_screenwidth() / 2 - window_width / 2)
-        position_down = int(dialog.winfo_screenheight() / 2 - window_height / 2)
-        dialog.geometry(f"+{position_right}+{position_down}")
-
         macro_name_label = tk.Label(dialog, text="Macro Name:")
         macro_name_label.grid(row=0, column=0, padx=5, pady=5)
 
-        macro_name_entry = tk.Entry(dialog, validate="key", validatecommand=(dialog.register(cls._validate_entry), "%P"))
-        macro_name_entry.grid(row=0, column=1, padx=5, pady=5)
-        cls.entry_name = macro_name_entry
+        cls.entry_name = tk.Entry(dialog, validate="key", validatecommand=(dialog.register(cls._validate_entry), "%P"))
+        cls.entry_name.grid(row=0, column=1, padx=5, pady=5)
 
         hotkey_label = tk.Label(dialog, text="Hotkey (optional, F1-F12):")
         hotkey_label.grid(row=1, column=0, padx=5, pady=5)
 
 
-        ok_button = tk.Button(dialog, text="OK", command=lambda: cls._return(dialog, macro_name_entry.get(), hotkey_entry.get()))
-        ok_button.grid(row=2, column=0, padx=5, pady=5)
-        cls.btn_ok = ok_button
+        cls.btn_ok = tk.Button(dialog, text="OK", command=lambda: cls._return(dialog, cls.entry_name.get(), cls.entry_hotkey.get()))
+        cls.btn_ok.grid(row=2, column=0, padx=5, pady=5)
 
         cls.btn_ok.config(state='disabled')
 
-        hotkey_entry = cls.FnKeyEntry(dialog, validate="key", validatecommand=(dialog.register(cls._validate_hotkey), "%P", "%S"))
-        hotkey_entry.grid(row=1, column=1, padx=5, pady=5)
+        cls.entry_hotkey = cls.FnKeyEntry(dialog, validate="key", validatecommand=(dialog.register(cls._validate_hotkey), "%P", "%S"))
+        cls.entry_hotkey.grid(row=1, column=1, padx=5, pady=5)
 
         cancel_button = tk.Button(dialog, text="Cancel", command=dialog.destroy)
         cancel_button.grid(row=2, column=1, padx=5, pady=5)
 
-        TkinterHelper.set_entry_text(macro_name_entry,cls.result_name )
-        TkinterHelper.set_entry_text(hotkey_entry,cls.result_hotkey )
+        tkh.set_entry_text(cls.entry_name,cls.result_name )
+        tkh.set_entry_text(cls.entry_hotkey,cls.result_hotkey )
 
         dialog.bind('<Escape>', lambda evt: dialog.destroy() )
-        dialog.bind('<Return>', lambda evt: cls._return(dialog, macro_name_entry.get(), hotkey_entry.get()))
-        dialog.update()
-        TkinterHelper.centre_dialog(dialog)
-        dialog.deiconify()
+        dialog.bind('<Return>', lambda evt: cls._return(dialog, cls.entry_name.get(), cls.entry_hotkey.get()))
+
+        tkh.centre_dialog(dialog, 365, 130)
 
         dialog.transient(parent_window)
         dialog.grab_set()
         dialog.focus_force()
-        macro_name_entry.focus()
+        cls.entry_name.focus()
 
         # Make the dialog modal
         dialog.wait_window(dialog)
@@ -81,40 +70,51 @@ class MacroDialog:
     @classmethod
     def _validate_entry(cls, input_text):
         valid = input_text.replace("_", "").isalnum() or input_text == ""
-
         but_ok_on = input_text.replace("_", "").isalnum()
-
         cls.btn_ok.config(state='normal' if but_ok_on else 'disabled')
         return valid
 
     @classmethod
     def _validate_hotkey(cls, input_text, changed_text):
-        print(f"Debug valid calleed: {(input_text, changed_text, cls.entry_name.get())=}")
-
-        txt_len = len(changed_text)
-
         cls.btn_ok.config(state='disabled')
-
         default_state = 'normal' if len(cls.entry_name.get()) > 0 else 'disabled'
+        rv = cls._validate_hotkey_actual(input_text, changed_text)
+        if cls.is_hotkey_txt(input_text):
+            cls.btn_ok.config(state=default_state)
+        return rv
 
-        if txt_len > 1 and changed_text[0] == "F" :
-            if txt_len == 1:
+    @classmethod
+    def _validate_hotkey_actual(cls, input_text, changed_text):
+
+        txt_len = len(input_text)
+        changed_text = changed_text.upper()
+
+        if len(changed_text) > 1 : # Function key pressed
+            return changed_text[0] == 'F'
+
+        if input_text.upper() == "F":
+            return True
+
+        if txt_len == 0 :
+            return True
+        if txt_len == 1 :
+            if changed_text[0] == "F":
                 return True
-            if 1 <= int(changed_text[1:]) <= 12:
-                cls.btn_ok.config(state=default_state)
-                return True
+                #tkh.set_entry_text(cls.entry_hotkey,"F")
             return False
 
-        if input_text in ["","F"]:
-            cls.btn_ok.config(state=default_state)
-            return True
-        if not changed_text.isdigit():
+        if not changed_text.isdigit() or not cls.is_hotkey_txt(input_text):
             return False
-        fnum = int(input_text[1:])
-        if 1 <= fnum <= 12:
-            cls.btn_ok.config(state=default_state)
-            return True
-        return False
+
+        return True
+
+    @staticmethod
+    def is_hotkey_txt(txt):
+        txt = txt.upper()
+        if len(txt) < 2 : return False
+        if txt[0] != "F": return False
+        return 1 <= int(txt[1:]) <= 12
+
 
     @classmethod
     def _return(cls, dialog, entered_macro_name, entered_hotkey):

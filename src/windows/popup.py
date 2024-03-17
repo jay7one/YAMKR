@@ -1,6 +1,6 @@
 from tkinter import Toplevel
 from sys import platform
-from app_bridge_helpers.tkinter_helper import TkinterHelper
+from windows.tkinter_helper import TkinterHelper
 
 class Popup(Toplevel):
     def __init__(self, name, w, h, parent):

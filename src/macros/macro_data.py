@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+# TODO: this should be better structured and variables renamed
 @dataclass
 class MacroData:
     name: str

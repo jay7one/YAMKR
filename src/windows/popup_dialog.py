@@ -1,22 +1,26 @@
 import tkinter as tk
-from windows.popup import Popup
+from windows.tkinter_helper import TkinterHelper
 
 class PopupDialog:
     @classmethod
     def popup(cls, parent_window, title, message, enable_cancel=False):
         cls.result = False
+
+
+        txt_font_ht = 18
+        button_ht = 80
+        border_ht = 10
+
+        line_count = cls.calculate_num_lines(message,26)
+        window_height = (txt_font_ht * line_count) + button_ht + border_ht
+
         dialog = tk.Toplevel(parent_window)
         dialog.title(title)
 
-        # Center the dialog on the screen
-        window_width = dialog.winfo_reqwidth()
-        window_height = dialog.winfo_reqheight()
-        position_right = int(dialog.winfo_screenwidth() / 2 - window_width / 2)
-        position_down = int(dialog.winfo_screenheight() / 2 - window_height / 2)
-        dialog.geometry(f"+{position_right}+{position_down}")
+        TkinterHelper.centre_dialog(dialog,dialog.winfo_reqwidth(), window_height )
 
-        label = tk.Label(dialog, text=message, justify=tk.LEFT, padx=10, pady=10, wraplength=300)
-        label.pack()
+        label = tk.Label(dialog, text=message, justify=tk.CENTER, padx=10, pady=5, wraplength=210, height=line_count,anchor="n")
+        label.pack(pady=5,padx=10)
 
         button_frame = tk.Frame(dialog)
         button_frame.pack(pady=5)
@@ -32,7 +36,6 @@ class PopupDialog:
 
         # Center the dialog
         dialog.update_idletasks()
-        Popup.geo_center(dialog,dialog.winfo_width(), dialog.winfo_height())
 
         dialog.transient(parent_window)
         dialog.grab_set()
@@ -49,6 +52,18 @@ class PopupDialog:
     def _return(cls, dialog):
         cls.result=True
         dialog.destroy()
+
+    @staticmethod
+    def calculate_num_lines(string, window_width):
+        lines = string.split('\n')
+        num_lines = 0
+
+        for line in lines:
+            num_lines += (len(line) // window_width) + 1
+            if len(line) % window_width == 0:
+                num_lines -= 1
+
+        return num_lines
 
 
 # Example usage:

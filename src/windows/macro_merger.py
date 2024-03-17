@@ -1,7 +1,7 @@
 import tkinter as tk
 from page.PyMouseMacro import MacroMerge
 from macros.macro_event import MacroEvent, EventType
-from app_bridge_helpers.tkinter_helper import TkinterHelper
+from windows.tkinter_helper import TkinterHelper
 
 class MacroMerger():
 

@@ -1,7 +1,7 @@
 from abc import ABC
 import copy
 import tkinter as tk
-from app_bridge_helpers.app_bridge_base import AppBridgeBase
+from app_bridge.app_bridge_base import AppBridgeBase
 from helpers.version import Version
 from windows.about import About
 from windows.macro_merger import MacroMerger
@@ -43,13 +43,14 @@ class MenuCommands(ABC, AppBridgeBase):
 
             if results:
                 self.selected_macro.events.extend(results)
+                self.save_selected_macro()
                 self.setup_events()
             return
         elif var_tag == self.MENU_EVTS_PASTE:
             if MenuCommands.copied_events:
                 self.selected_macro.add_event_list(MenuCommands.copied_events, MenuCommands.copied_offsets)
-                self.setup_events()
                 self.btn_bold_on_modify(True)
+                self.setup_events()
                 self.sbar_msg(f"{len(MenuCommands.copied_events)} Events Pasted.")
             return
         elif var_tag == self.MENU_EVTS_COPY:

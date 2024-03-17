@@ -45,20 +45,20 @@ class VerticalScrolledFrame:
             # all other attributes (_w, children, etc) are passed to self.inner
             return getattr(self.inner, item)
 
-    def _on_frame_configure(self, event=None):
-        x1, y1, x2, y2 = self.canvas.bbox("all")
+    def _on_frame_configure(self, _):
+        _, _, x2, y2 = self.canvas.bbox("all")
         height = self.canvas.winfo_height()
         width = self.canvas.winfo_width()                               # (added) to resize inner frame
         self.canvas.config(scrollregion = (0,0, x2, max(y2, height)))
         self.canvas.itemconfigure("all", width=width)    # (added) to resize inner frame
 
 
-    def _bind_mouse(self, event=None):
+    def _bind_mouse(self, _):
         self.canvas.bind_all("<4>", self._on_mousewheel)
         self.canvas.bind_all("<5>", self._on_mousewheel)
         self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
 
-    def _unbind_mouse(self, event=None):
+    def _unbind_mouse(self, _):
         self.canvas.unbind_all("<4>")
         self.canvas.unbind_all("<5>")
         self.canvas.unbind_all("<MouseWheel>")

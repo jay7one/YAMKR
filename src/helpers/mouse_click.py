@@ -1,7 +1,8 @@
+from abc import ABC
 from typing import Tuple
 from pynput.mouse import Listener as MouseListener
 
-class MouseClick:
+class MouseClick(ABC):
     next_click:Tuple[int, int]
 
     @staticmethod
@@ -9,6 +10,7 @@ class MouseClick:
         if pressed:
             MouseClick.next_click = (x, y)
             return False  # Stop the listener
+        return True
 
     @staticmethod
     def get_next_click()-> Tuple[int, int]:

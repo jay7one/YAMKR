@@ -4,10 +4,10 @@ from page.PyMouseMacro import PyMouseMacro
 from app_data.macro_manager import MacroManager
 from app_data.app_settings import AppSettings
 from macros import Macro
-from app_bridge_helpers.event_widget import EventWidget
-from app_bridge_helpers.button_commands import ButtonCommands
-from app_bridge_helpers.menu_commands import MenuCommands
-from app_bridge_helpers.tkinter_helper import TkinterHelper
+from app_bridge.event_widget import EventWidget
+from app_bridge.button_commands import ButtonCommands
+from app_bridge.menu_commands import MenuCommands
+from windows.tkinter_helper import TkinterHelper as tkh
 from helpers.version import Version
 
 # TODO: Full list below:
@@ -28,7 +28,7 @@ from helpers.version import Version
 # pressing enter on entry field should be click ok event
 # Paste should be like record, have buttons in red.
 
-class AppBridge(ButtonCommands, MenuCommands):
+class AppBridgeMain(ButtonCommands, MenuCommands):
 
     def __init__(self, main_win:PyMouseMacro) -> None:
         super().__init__()
@@ -53,7 +53,7 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.additional_settings()
         self.setup_button_icons()
 
-        TkinterHelper.set_tab_order(self.main_win.top)
+        tkh.set_tab_order(self.main_win.top)
 
         self.main_win.frame_macro_evt_buttons.lift()
         self.main_win.lframe_macro_settings.lift()
@@ -61,8 +61,8 @@ class AppBridge(ButtonCommands, MenuCommands):
         self.main_win.frame_macro_list_buttons.lift()
 
         self.main_geo = self.app_settings.get_main_geo()
-        self.set_window_geo(self.root,self.main_geo)
-        TkinterHelper.set_main_geo(self.main_win.top, self.main_geo)
+        tkh.set_window_geo(self.root,self.main_geo)
+        tkh.set_main_geo(self.main_win.top)
 
         self.menu_setting_vars['min_on_play'] = tk.BooleanVar()
         self.menu_setting_vars['min_on_record'] = tk.BooleanVar()
@@ -85,17 +85,21 @@ class AppBridge(ButtonCommands, MenuCommands):
     def setup_button_icons(self):
 
         #font="-family {DejaVu Sans} -size 10"
-        bt_font = r"-family {Lucid Console} -size 14"
+        bt_font = r"-family {Lucid Console} -size "
+        bt_size = 12
         btns = {
-            'folder'  : (self.main_win.btn_folder,  '\U0001F4C1', '... Open file explorer where macro resides '    ),
-            'refresh' : (self.main_win.btn_refresh, '\u27F3'    , '... Refresh macro list '  ),
-            'rename'  : (self.main_win.btn_rename,  '\U0000270E', '... Rename selected macro'  ),
+            'folder'  : (self.main_win.btn_folder,      '\U0001F4C2', 15, '... Open file explorer where macro resides '    ),
+            'refresh' : (self.main_win.btn_refresh,     '\u27F3'    , 12,  '... Refresh macro list '  ),
+            'rename'  : (self.main_win.btn_rename,      '\U0000270E', 16,  '... Rename selected macro'  ),
+            'delete'  : (self.main_win.btn_del_macro,   '\U0000274C', 9,  '... Delete selected macro'  ),
+            'add'     : (self.main_win.btn_add_macro,   '\U00002795', 9,  '... Create new macro'  ),
+
         }
         bt:tk.Button
         for _,v in btns.items():
-            bt, txt, hover_t = v
+            bt, txt, fsize, hover_t = v
             bt.config(text=txt)
-            bt.config(font=bt_font)
+            bt.config(font=bt_font + str(fsize) )
             bt.bind("<Enter>", lambda btn=bt, ht=hover_t    : self.set_button_sbar(None,ht) )
             bt.bind("<Leave>", lambda btn=bt, ht=''         : self.set_button_sbar(None,ht) )
 
@@ -121,9 +125,9 @@ class AppBridge(ButtonCommands, MenuCommands):
 
     def config_event(self,event):   # pylint: disable=unused-argument
         if event.widget is self.root:
-            self.app_settings.set_main_geo(self.get_window_geo(self.root))
+            self.app_settings.set_geo_settings(tkh.get_window_geo(self.root))
             self.main_geo = self.app_settings.get_main_geo()
-            TkinterHelper.set_main_geo(self.main_win.top, self.main_geo)
+            tkh.set_main_geo(self.main_win.top)
 
     def check_for_hotkey(self, event:tk.Event):
         hotkey = event.keysym
@@ -169,7 +173,7 @@ class AppBridge(ButtonCommands, MenuCommands):
 
         self.setup_numeric_entry()
 
-        self.set_entry_text(self.main_win.entry_repeat,"1")
+        tkh.set_entry_text(self.main_win.entry_repeat,"1")
 
     def setup_numeric_entry(self):
         entry_widgets = [
@@ -180,7 +184,7 @@ class AppBridge(ButtonCommands, MenuCommands):
             ]
 
         for ew in entry_widgets:
-            val_num_cmd = ew.register(self.validate_number)
+            val_num_cmd = ew.register(tkh.validate_number)
             ew.config(validate="key", validatecommand=(val_num_cmd, '%P'))
 
         vcmd = self.main_win.entry_repeat.register(self.validate_repeat_callback)
@@ -229,13 +233,13 @@ class AppBridge(ButtonCommands, MenuCommands):
 
         self.main_win.lb_hotkey_text['text'] = macro.hotkey
 
-        self.set_entry_text(self.main_win.entry_repeat, macro.global_repeat)
+        tkh.set_entry_text(self.main_win.entry_repeat, macro.global_repeat)
 
-        self.set_entry_text(self.main_win.entry_k_press_intv, f"{macro.global_keypress_interval}")
-        self.set_entry_text(self.main_win.entry_m_press_intv, f"{macro.global_mousepress_interval}")
-        self.set_entry_text(self.main_win.entry_rel_delay, f"{macro.global_release_interval}")
+        tkh.set_entry_text(self.main_win.entry_k_press_intv, f"{macro.global_keypress_interval}")
+        tkh.set_entry_text(self.main_win.entry_m_press_intv, f"{macro.global_mousepress_interval}")
+        tkh.set_entry_text(self.main_win.entry_rel_delay, f"{macro.global_release_interval}")
 
-        self.button_toggle(self.main_win.btn_move_mouse,  macro.global_mouse_movement)
+        tkh.button_toggle(self.main_win.btn_move_mouse,  macro.global_mouse_movement)
 
         self.btn_cmd_mouse_intv_state(self.main_win.btn_mouse_press_intv)
         self.btn_cmd_key_intv_state(self.main_win.btn_key_press_intv)
@@ -254,12 +258,12 @@ class AppBridge(ButtonCommands, MenuCommands):
         macro = self.selected_macro
         macro.hotkey = self.main_win.lb_hotkey_text['text']
         macro.global_repeat = int(self.main_win.entry_repeat.get())
-        macro.global_keypress_interval = self.get_entry_int(self.main_win.entry_k_press_intv)
-        macro.global_mousepress_interval = self.get_entry_int(self.main_win.entry_m_press_intv)
-        macro.global_mouse_movement = self.button_state(self.main_win.btn_move_mouse)
-        macro.global_mousepress_interval_on = self.button_state(self.main_win.btn_mouse_press_intv)
-        macro.global_keypress_interval_on = self.button_state(self.main_win.btn_key_press_intv)
-        macro.global_release_interval_on = self.button_state(self.main_win.btn_post_rel_intv)
+        macro.global_keypress_interval = tkh.get_entry_int(self.main_win.entry_k_press_intv)
+        macro.global_mousepress_interval = tkh.get_entry_int(self.main_win.entry_m_press_intv)
+        macro.global_mouse_movement = tkh.button_state(self.main_win.btn_move_mouse)
+        macro.global_mousepress_interval_on = tkh.button_state(self.main_win.btn_mouse_press_intv)
+        macro.global_keypress_interval_on = tkh.button_state(self.main_win.btn_key_press_intv)
+        macro.global_release_interval_on = tkh.button_state(self.main_win.btn_post_rel_intv)
         macro.global_mouse_offset_x , macro.global_mouse_offset_y = self.mouse_offset()
         self.macro_manager.save_macro(macro)
         self.sbar_msg(f"Saved macro: {self.selected_macro.name}")
@@ -330,7 +334,7 @@ class AppBridge(ButtonCommands, MenuCommands):
         e = self.main_win.entry_repeat
         p_str = self.get_text(e)
         if p_str == "" or p_str == "0":
-            self.set_entry_text(e,"1")
+            tkh.set_entry_text(e,"1")
         return True
 
 
@@ -348,8 +352,8 @@ class AppBridge(ButtonCommands, MenuCommands):
 
         cls.pymacros_toplevel.update()
 
-        cls.app_bridge = AppBridge(cls.pymacros_win)
+        cls.app_bridge = AppBridgeMain(cls.pymacros_win)
         cls.root.mainloop()
 
 if __name__ == '__main__':
-    AppBridge.main()
+    AppBridgeMain.main()

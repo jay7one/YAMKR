@@ -1,11 +1,10 @@
 from abc import abstractmethod
-from app_bridge_helpers.tkinter_helper import TkinterHelper
 from macros.macro import Macro
 from page.PyMouseMacro import PyMouseMacro
 from app_data.app_settings import AppSettings
 from app_data.macro_manager import MacroManager
 
-class AppBridgeBase(TkinterHelper):
+class AppBridgeBase:
     root=None
     pymacros_toplevel, pymacros_win = None,None
     app_bridge = None
@@ -50,6 +49,10 @@ class AppBridgeBase(TkinterHelper):
 
     @abstractmethod
     def btn_bold_on_modify(self, modified):
+        pass
+
+    @abstractmethod
+    def save_selected_macro(self):
         pass
 
 if __name__ == '__main__':
