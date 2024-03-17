@@ -38,6 +38,8 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
         self.app_settings = AppSettings()
         self.macro_manager = MacroManager()
 
+        self.main_win.top.title("YAMKR - Yet Another Mouse and Keyboard Recorder")
+
         self.app_settings.set_version(Version.get_from_file())
         if self.app_settings.check_for_upd_enabled():
             if not Version.check_version():
@@ -86,7 +88,6 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
 
         #font="-family {DejaVu Sans} -size 10"
         bt_font = r"-family {Lucid Console} -size "
-        bt_size = 12
         btns = {
             'folder'  : (self.main_win.btn_folder,      '\U0001F4C2', 15, '... Open file explorer where macro resides '    ),
             'refresh' : (self.main_win.btn_refresh,     '\u27F3'    , 12,  '... Refresh macro list '  ),
@@ -137,7 +138,6 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
                 self.select_load_macro(macro_name)
                 self.main_win.btn_play.invoke()
 
-        #print(f"debug {(event.keycode, event.keysym, event.char)=}")
 
     def add_callbacks(self,main_win:PyMouseMacro):
 

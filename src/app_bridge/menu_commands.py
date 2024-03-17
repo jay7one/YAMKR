@@ -19,7 +19,6 @@ class MenuCommands(ABC, AppBridgeBase):
     copied_offsets = None
 
     def menu_callback(self, var_tag, *args):
-        #print(f"debug cb {var_tag=}{args=}")
         set_on=None
         if args:
             bv:tk.BooleanVar = args[0]
