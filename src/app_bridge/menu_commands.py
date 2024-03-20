@@ -10,6 +10,7 @@ class MenuCommands(ABC, AppBridgeBase):
     MENU_MIN_PLAY   = 'Minimize on Play'
     MENU_MIN_REC    = 'Minimize on Record'
     MENU_CHK_UPD    = 'Check for Updates'
+    MENU_AUTOSAVE   = 'Auto-save'
     MENU_ABOUT      = 'About'
     MENU_MERGE      = 'Merge ...'
     MENU_EVTS_COPY  = 'Copy Events'
@@ -28,6 +29,8 @@ class MenuCommands(ABC, AppBridgeBase):
             self.app_settings.set_min_on_play(set_on)
         elif var_tag == self.MENU_MIN_REC:
             self.app_settings.set_min_on_record(set_on)
+        elif var_tag == self.MENU_AUTOSAVE:
+            self.app_settings.set_autosave(set_on)
         elif var_tag == self.MENU_CHK_UPD:
             self.app_settings.set_check_for_upd(set_on)
             if set_on and not Version.check_version():

@@ -29,7 +29,8 @@ class AppSettings(Settings):
             "Others": {
                 "Check_update": True,
                 "Fixed_timestamp": 0,
-                "Version": 0
+                "Version": 0,
+                "Autosave": True
             }
 
         }
@@ -58,6 +59,17 @@ class AppSettings(Settings):
 
     def set_min_on_record(self,min_on): self.set_min_on(self.MIN_ON_RECPORD, min_on)
     def set_min_on_play(self,min_on):   self.set_min_on(self.MIN_ON_PLAY, min_on)
+
+    def get_autosave(self):
+        is_on = self.get_config()["Others"]['Autosave']
+        return is_on
+
+    def set_autosave(self,is_on:bool):
+        is_on = self.get_config()["Others"]['Autosave']
+        settings = self.get_config()
+        settings["Others"]['Autosave'] = is_on
+        self.save_dict(settings)
+
 
     def get_min_on_record(self): return self.get_min_on(self.MIN_ON_RECPORD)
     def get_min_on_play(self):   return self.get_min_on(self.MIN_ON_PLAY)

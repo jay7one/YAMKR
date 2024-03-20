@@ -1,7 +1,7 @@
 import tkinter as tk
 from macros.macro_event import MacroEvent, EventType
 
-class EventWidget(tk.Label):
+class EventWidget(tk.Button):
 
     ICONS = {
         EventType.KEY_UP:       ("", "\u2191"),
@@ -13,8 +13,20 @@ class EventWidget(tk.Label):
     }
 
     def __init__(self, parent, event, *args, **kwargs):
-        super().__init__(parent, *args, **kwargs, )
-        self.event = event
+        self.event:MacroEvent = event
+        state = "normal" if self.event.event_type == EventType.DELAY else 'disabled'
+        super().__init__(parent, anchor=tk.W,disabledforeground = 'white', background='darkgreen', foreground='yellow', state=state, *args, **kwargs, )
+
+
+        fg,bg='yellow','darkgreen'
+        disabledforeground = 'white'
+        state='disabled'
+
+        #if self.event.event_type == EventType.DELAY:
+        #    state='normal'#
+
+        #self.config()
+
         self.draw()
 
     def draw(self):
@@ -26,7 +38,10 @@ class EventWidget(tk.Label):
             if icon2 == "":
                 text += "ms"
             text = text.ljust(12)
-            self.config(text=text,anchor=tk.W, relief='raised')
+            self.config(text=text)
+
+    def get_delay(self):
+        return self.event.event_value
 
 # Example usage:
 if __name__ == "__main__":

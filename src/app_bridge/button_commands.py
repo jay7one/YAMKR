@@ -3,7 +3,7 @@ import tkinter as tk
 
 from app_bridge.app_bridge_base import AppBridgeBase
 
-from macros.macro import MacroEvent, MACRO_EXT
+from macros.macro import MacroEvent, MACRO_EXT, EventType
 from macros.macro_data import MacroData
 from helpers.mouse_click import MouseClick
 from helpers.file_explorer import FileExplorer
@@ -23,13 +23,14 @@ class ButtonCommands(ABC, AppBridgeBase):
         entry.config(state=new_state)
 
     def clear_evt_labels(self):
+        self.last_evt_clicked = None
+        self.set_delay_upd_bt()
+
         tkh.clear_frame(self.main_win.swin_events_f)
 
         #self.main_win.swin_events.delete("all")
         #for l in self.main_win.swin_events_f.children.values():
         #    l.grid_forget()
-
-
 
 
     def btn_cmd_clear(self):
@@ -215,3 +216,19 @@ class ButtonCommands(ABC, AppBridgeBase):
         self.macro_manager.rename_macro(self.selected_macro,new_name)
         self.load_macro_list()
         self.macro_select(new_name)
+
+    def btn_cmd_delay_update(self,*args):
+        if not self.selected_macro: return
+        evt_val = tkh.get_entry_int(self.main_win.entry_delay_edit)
+        if evt_val == 0 : return
+
+        new_evt = self.last_evt_clicked
+        if self.last_evt_clicked is None:
+            new_evt = MacroEvent(EventType.DELAY, evt_val)
+            self.selected_macro.add_event_list([new_evt])
+            self.sbar_msg("Delay Event Added.")
+            self.setup_events()
+        else:
+            self.last_evt_clicked.event.event_value = evt_val
+            self.last_evt_clicked.draw()
+            self.sbar_msg("Delay event updated.")

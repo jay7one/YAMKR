@@ -61,7 +61,7 @@ class Macro(MacroData, MacroEventManager):
     def add_event(self, event_type, event_value):
         self.events.append( MacroEvent(event_type,event_value))
 
-    def add_event_list(self, new_events:list[MacroEvent], org_offsets):
+    def add_event_list(self, new_events:list[MacroEvent], org_offsets=(0,0)):
         ox,oy = org_offsets
         for e in new_events:
             new_evt = copy.deepcopy(e)

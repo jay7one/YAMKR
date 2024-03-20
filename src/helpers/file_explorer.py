@@ -20,4 +20,4 @@ class FileExplorer(ABC):    # pylint: disable=too-few-public-methods
 
 # Example usage:
 if __name__ == "__main__":
-    FileExplorer.open("C:/Users/sauja/AppData/Local/PyMouseMacro/macros")
+    FileExplorer.open("C:/Users/xxx/AppData/Local/PyMouseMacro/macros")

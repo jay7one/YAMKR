@@ -158,6 +158,8 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
         self.main_win.btn_add_macro.        config(command=lambda b=self.main_win.btn_add_macro         :self.btn_cmd_macro_add(b))
         self.main_win.btn_del_macro.        config(command=lambda b=self.main_win.btn_del_macro         :self.btn_cmd_macro_del(b))
         self.main_win.btn_rename.           config(command=lambda b=self.main_win.btn_rename            :self.btn_cmd_rename(b))
+        self.main_win.btn_delay_update.     config(command=lambda b=self.main_win.btn_delay_update      :self.btn_cmd_delay_update(b))
+
 
         self.main_win.btn_play.config(command=self.btn_cmd_play)
 
@@ -190,6 +192,21 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
         vcmd = self.main_win.entry_repeat.register(self.validate_repeat_callback)
         self.main_win.entry_repeat.config(validate='focusout', validatecommand=(vcmd, '%P'))
 
+        vcmd = self.main_win.entry_delay_edit.register(self.validate_delay_callback)
+        self.main_win.entry_delay_edit.config(validate='key', validatecommand=(vcmd, '%P'))
+
+    def validate_delay_callback(self,P):
+        p_str = str(P)
+        val_ok = str.isdigit(p_str)
+
+        st = tk.NORMAL
+
+        if not val_ok or p_str == '' :
+            st = tk.DISABLED
+
+        self.main_win.btn_delay_update.config(state=st)
+
+        return p_str == '' or val_ok
 
     def macro_list_callback(self, event):
         selection = event.widget.curselection()
@@ -269,7 +286,6 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
         self.sbar_msg(f"Saved macro: {self.selected_macro.name}")
 
     def setup_events(self):
-
         self.clear_evt_labels()
         if not self.selected_macro.events :
             return
@@ -289,7 +305,7 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
         #num_columns = max(1, canvas_width // max_label_width)
         num_columns= 4
         # num_rows = math.ceil(len(label_list) / num_columns)
-        label:tk.Label = None
+        evt_widget:EventWidget = None
         for i, evt in enumerate(self.selected_macro.events):
             row = i // num_columns
             col = i % num_columns
@@ -299,14 +315,44 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
             #lfont = "Noto Color Emoji"
             lfont = "Lucid Console"
             #label = EventWidget(self.main_win.swin_events, evt, justify='left',font=(lfont, 12) )
-            label = EventWidget(inner_frame, evt, justify='left',font=(lfont, 10) )
-
-            label.grid(row=row, column=col, sticky="w", padx=5, pady=5)
+            evt_widget = EventWidget(inner_frame, evt,justify='left',font=(lfont, 10) )
+            evt_widget.grid(row=row, column=col, sticky="w", padx=5, pady=5)
+            evt_widget.config(command=lambda evt_wid=evt_widget : self.delay_click_callback(evt_wid))
             #
             # label.grid(sticky="w")
 
-        label.wait_visibility()
+        evt_widget.wait_visibility()
         self.events_drawn()
+        self.set_delay_upd_bt()
+
+    def set_delay_upd_bt(self):
+        delay = tkh.get_entry_int(self.main_win.entry_delay_edit)
+        if not delay :
+            self.main_win.btn_delay_update.config(state='disabled')
+            return
+
+        button_text = 'Update'
+        if self.last_evt_clicked is None:
+            button_text = 'Add'
+        self.main_win.btn_delay_update.config(text=button_text, state='normal')
+
+    def delay_click_callback(self,evt_wid:EventWidget):
+
+        if self.last_evt_clicked == evt_wid:
+            self.last_evt_clicked.config(relief=tk.RAISED, background='darkgreen')
+            self.last_evt_clicked = None
+            delay = ""
+        else:
+            if self.last_evt_clicked is not None:
+                self.last_evt_clicked.config(relief=tk.RAISED, background='darkgreen')
+            self.last_evt_clicked = evt_wid
+            delay = self.last_evt_clicked.get_delay()
+            self.last_evt_clicked.config(relief=tk.SUNKEN, background='blue')
+
+        tkh.set_entry_text(self.main_win.entry_delay_edit, delay)
+        self.set_delay_upd_bt()
+
+
 
     def events_drawn(self):
         inner_frame:tk.Canvas = self.main_win.swin_events_f

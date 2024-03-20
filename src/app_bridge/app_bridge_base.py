@@ -3,11 +3,13 @@ from macros.macro import Macro
 from page.PyMouseMacro import PyMouseMacro
 from app_data.app_settings import AppSettings
 from app_data.macro_manager import MacroManager
+from app_bridge.event_widget import EventWidget
 
 class AppBridgeBase:
     root=None
     pymacros_toplevel, pymacros_win = None,None
     app_bridge = None
+
 
     def __init__(self) -> None:
         self.main_win:PyMouseMacro = None
@@ -16,9 +18,13 @@ class AppBridgeBase:
         self.selected_macro:Macro = None
         self.menu_setting_vars = {}
         self.main_geo = None
+        self.last_evt_clicked:EventWidget = None
 
     def sbar_msg(self,msg) -> None:
         self.main_win.lb_status_bar['text'] = msg
+
+    @abstractmethod
+    def set_delay_upd_bt(self):pass
 
     @abstractmethod
     def get_macro_names(self, refresh=False):pass
