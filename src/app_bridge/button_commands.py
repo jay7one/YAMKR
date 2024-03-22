@@ -67,7 +67,12 @@ class ButtonCommands(ABC, AppBridgeBase):
         tkh.button_toggle(button,self.selected_macro.global_release_interval_on)
         self.entry_toggle(self.main_win.entry_rel_delay, self.selected_macro.global_release_interval_on)
 
-    def btn_bold_on_modify(self, modified):
+    def btn_bold_on_modify(self, modified:bool):
+
+        if self.app_settings.get_autosave():
+            self.save_selected_macro()
+            modified=False
+
         for btn in [self.main_win.btn_save, self.main_win.btn_restore]:
             if modified:
                 btn.config(foreground='red')
@@ -211,7 +216,7 @@ class ButtonCommands(ABC, AppBridgeBase):
 
     def btn_cmd_rename(self,*args):
         if not self.selected_macro: return
-        new_name, hotkey = MacroDialog.show(self.root, "Rename Macro", self.selected_macro.name,self.selected_macro.hotkey)
+        new_name, _ = MacroDialog.show(self.root, "Rename Macro", self.selected_macro.name,self.selected_macro.hotkey)
         if not new_name : return
         self.macro_manager.rename_macro(self.selected_macro,new_name)
         self.load_macro_list()
@@ -232,3 +237,5 @@ class ButtonCommands(ABC, AppBridgeBase):
             self.last_evt_clicked.event.event_value = evt_val
             self.last_evt_clicked.draw()
             self.sbar_msg("Delay event updated.")
+
+        self.btn_bold_on_modify(True)

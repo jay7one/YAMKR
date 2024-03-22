@@ -75,6 +75,7 @@ class MenuCommands(ABC, AppBridgeBase):
             self.MENU_MIN_PLAY:     ('min_on_play',     self.app_settings.get_min_on_play       , self.main_win.sub_menu12),
             self.MENU_MIN_REC:      ('min_on_record',   self.app_settings.get_min_on_record     , self.main_win.sub_menu12),
             self.MENU_CHK_UPD:      ('Check_update',    self.app_settings.check_for_upd_enabled , self.main_win.sub_menu12),
+            self.MENU_AUTOSAVE:     ('Autosave',        self.app_settings.get_autosave          , self.main_win.sub_menu12),
 
             self.MENU_EVTS_COPY:    (None,None , self.main_win.sub_menu1),
             self.MENU_EVTS_PASTE:   (None,None , self.main_win.sub_menu1),

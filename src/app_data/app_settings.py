@@ -61,11 +61,9 @@ class AppSettings(Settings):
     def set_min_on_play(self,min_on):   self.set_min_on(self.MIN_ON_PLAY, min_on)
 
     def get_autosave(self):
-        is_on = self.get_config()["Others"]['Autosave']
-        return is_on
+        return self.get_config()["Others"]['Autosave']
 
     def set_autosave(self,is_on:bool):
-        is_on = self.get_config()["Others"]['Autosave']
         settings = self.get_config()
         settings["Others"]['Autosave'] = is_on
         self.save_dict(settings)
