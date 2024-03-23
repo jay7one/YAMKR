@@ -1,4 +1,5 @@
 from abc import abstractmethod
+import tkinter as tk
 from macros.macro import Macro
 from page.PyMouseMacro import PyMouseMacro
 from app_data.app_settings import AppSettings
@@ -59,6 +60,10 @@ class AppBridgeBase:
 
     @abstractmethod
     def save_selected_macro(self):
+        pass
+
+    @abstractmethod
+    def check_for_hotkey(self, event:tk.Event):
         pass
 
 if __name__ == '__main__':

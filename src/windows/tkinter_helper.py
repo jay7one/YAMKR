@@ -4,7 +4,7 @@ from app_bridge.tab_ordering import TabOrdering
 class TkinterHelper(TabOrdering):
     main_win_geo:tuple[int,int,int,int] = (0,0,0,0)
     @classmethod
-    def set_main_geo(cls, win_tl:tk.Toplevel):
+    def store_main_geo(cls, win_tl:tk.Toplevel):
         win_tl_geo = win_tl.geometry()
         cls.main_win_geo = cls.get_geo(win_tl_geo)
 

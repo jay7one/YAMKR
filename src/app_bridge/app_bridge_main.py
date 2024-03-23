@@ -64,7 +64,7 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
 
         self.main_geo = self.app_settings.get_main_geo()
         tkh.set_window_geo(self.root,self.main_geo)
-        tkh.set_main_geo(self.main_win.top)
+        tkh.store_main_geo(self.main_win.top)
 
         self.menu_setting_vars['min_on_play'] = tk.BooleanVar()
         self.menu_setting_vars['min_on_record'] = tk.BooleanVar()
@@ -128,15 +128,17 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
         if event.widget is self.root:
             self.app_settings.set_geo_settings(tkh.get_window_geo(self.root))
             self.main_geo = self.app_settings.get_main_geo()
-            tkh.set_main_geo(self.main_win.top)
+            tkh.store_main_geo(self.main_win.top)
 
     def check_for_hotkey(self, event:tk.Event):
         hotkey = event.keysym
-        if hotkey[0] == "F":
+        print(f"Debug check hk:{hotkey}")
+        if hotkey[0] == "F" and len(event.keysym) > 1:
             macro_name = self.macro_manager.find_hotkey_macro(hotkey)
             if macro_name:
-                self.select_load_macro(macro_name)
+                self.macro_select(macro_name)
                 self.main_win.btn_play.invoke()
+        return True
 
 
     def add_callbacks(self,main_win:PyMouseMacro):
@@ -177,6 +179,7 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
 
         tkh.set_entry_text(self.main_win.entry_repeat,"1")
 
+
     def setup_numeric_entry(self):
         entry_widgets = [
             self.main_win.entry_rel_delay,
@@ -216,6 +219,7 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
         self.select_load_macro(macro_name)
 
     def select_load_macro(self, macro_name):
+        print(f"Debug sel/load:{macro_name}")
         self.selected_macro = self.macro_manager.load_macro(macro_name)
         self.update_macro_screen()
         self.sbar_msg(f"Loaded macro: {self.selected_macro.name}")
@@ -283,6 +287,7 @@ class AppBridgeMain(ButtonCommands, MenuCommands):
         macro.global_release_interval_on = tkh.button_state(self.main_win.btn_post_rel_intv)
         macro.global_mouse_offset_x , macro.global_mouse_offset_y = self.mouse_offset()
         self.macro_manager.save_macro(macro)
+
         self.sbar_msg(f"Saved macro: {self.selected_macro.name}")
 
     def setup_events(self):

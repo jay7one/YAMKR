@@ -12,9 +12,9 @@ class HotKeyHelper:
     @classmethod
     def on_key_press(cls, event, root, hotkey_label, add_hotkey_button):
 
-        #print(f"Debug botton pressed:{event=}")
+        print(f"Debug internal hk key press :{event=}")
 
-        if event.keysym.startswith('F') and event.keysym[1:].isdigit():
+        if event.keysym.startswith('F') and event.keysym[1:].isdigit() and event.keysym != 'F10':
             hotkey = event.keysym
             cls.set_hotkey(root,add_hotkey_button, hotkey_label, f"{hotkey}")
             return False

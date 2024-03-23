@@ -109,6 +109,7 @@ class ButtonCommands(ABC, AppBridgeBase):
         if self.selected_macro is None: return
         self.selected_macro.assign_hotkey("")
         self.main_win.lb_hotkey_text['text']=""
+        self.btn_bold_on_modify(True)
 
     def btn_cmd_hotkey_add(self,button:tk.Button):
         if self.selected_macro is None: return
@@ -120,6 +121,7 @@ class ButtonCommands(ABC, AppBridgeBase):
             self.set_hotkey_callback
             )
 
+
     def set_hotkey_callback(self):
         new_hotkey = self.main_win.lb_hotkey_text['text']
 
@@ -129,6 +131,8 @@ class ButtonCommands(ABC, AppBridgeBase):
             self.selected_macro.hotkey = new_hotkey
 
         self.main_win.lb_hotkey_text['text'] = self.selected_macro.hotkey
+        self.root.bind("<Key>", self.check_for_hotkey )
+        self.btn_bold_on_modify(True)
 
     def btn_cmd_macro_add(self,*args):
         name, hotkey = MacroDialog.show(self.root)
