@@ -1,5 +1,5 @@
-# YAMKR - Yet Another Mouse and Keyboard Recorder (Windows only)
-Python App to Manage multiple macros 
+# YAMKR 
+Yet Another Mouse and Keyboard Recorder (Windows only) - Python App to Manage multiple macros 
 
 ![image](https://github.com/jay7one/YAMKR/assets/89343983/04a317d2-b0b0-4ccb-b0b3-475fbf5827d7)
 
